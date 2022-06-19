@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if sudo test -f "/opt/installation_complete"; then
+    exit 0
+else
+    echo "done" | sudo tee /opt/installation_complete
+fi
+
 # Initial update
 sudo apt update -y
 

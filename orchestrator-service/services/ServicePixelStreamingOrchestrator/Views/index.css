@@ -1,0 +1,286 @@
+/*Copyright Epic Games, Inc. All Rights Reserved.*/
+
+:root {
+	/*Using colour scheme https://color.adobe.com/TD-Colors---Option-3-color-theme-10394433/*/
+	--colour1:#2B3A42;
+	--colour2:#242424;
+	--colour3:#BDD4DE;
+	--colour4:#b0b0b0;
+	--colour5:#0262c3;
+	--colour6:#0f0f0f;
+	--colour7:#2f2f2f;
+	--colour8:#151515;
+	
+	--buttonFont:Arial;
+	--inputFont:Arial;
+}
+
+body{
+    margin: 0px;
+    background-color: black;
+}	
+
+#playerUI {
+	width: 100%;
+	position: absolute;
+	/*top: 0;
+	left: 0;*/
+	z-index: 10;
+}
+
+.statsContainer {
+	background-color: var(--colour6);
+	text-align: left;
+	display: block;
+	margin-top: 5px;
+}
+
+.stats {
+	font-size: 14px;
+	font-weight: bold;
+	padding: 6px;
+	color: var(--colour5);
+}
+
+canvas{
+    image-rendering: crisp-edges;
+    position: absolute;
+}
+
+video{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+#player{
+	width: 1280px;
+	height: 720px;
+	position: relative;
+	background-color: #000;
+}
+
+#overlay{
+	-moz-border-radius-bottomright: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px; /* future proofing */
+	border-bottom-left-radius: 5px; /* future proofing */
+	-khtml-border-bottom-right-radius: 5px; /* for old Konqueror browsers */
+	-khtml-border-bottom-left-radius: 5px; /* for old Konqueror browsers */
+	
+	-webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+	
+	position: absolute;
+	top: 0;
+	right: 2%;
+	z-index: 100;
+	border: 4px solid var(--colour8);
+	border-top-width: 0px;
+}
+
+.overlay {
+    background-color: var(--colour2);
+	font-family: var(--buttonFont);
+	font-weight: lighter;
+	color: var(--colour4);
+}
+
+.overlay-shown > #overlaySettings {
+	display: block;
+}
+
+.overlay-shown > div > #qualityStatus {
+	transform: rotate(-135deg);
+	-webkit-transform: rotate(-135deg); /* Safari */
+	-moz-transform: rotate(-135deg); /* Firefox */
+	-ms-transform: rotate(-135deg); /* IE */
+	-o-transform: rotate(-135deg); /* Opera */
+}
+
+.fullscreen-enabled > div > #fullscreenButton {
+	transform: rotate(-135deg);
+	-webkit-transform: rotate(-135deg); /* Safari */
+	-moz-transform: rotate(-135deg); /* Firefox */
+	-ms-transform: rotate(-135deg); /* IE */
+	-o-transform: rotate(-135deg); /* Opera */
+}
+
+#fullscreenButton:hover {
+	cursor: pointer;
+}
+
+#fullscreenButton {
+	transition-duration: 250ms;
+	margin-left: 20px;
+	padding: 4px;
+}
+
+#qualityStatus:hover {
+	cursor: pointer;
+}
+
+#qualityStatus {
+	transition-duration: 250ms;
+	padding: 4px;
+}
+
+#overlaySettings{
+	font-size: 1em;
+	width: 400px;
+	display: none;
+}
+
+#videoPlayOverlay{
+	z-index: 30;
+	position: absolute;
+	color: var(--colour4);
+	font-size: 1.8em;
+	font-family: var(--inputFont);
+	width: 100%;
+	height: 100%;
+	background-color: rgba(100, 100, 100, 0.7);
+}
+
+/* State for element to be clickable */
+.clickableState{
+	align-items: center;
+	justify-content: center;
+	display: flex;
+	cursor: pointer;
+}
+
+/* State for element to show text, this is for informational use*/
+.textDisplayState{
+	display: flex;
+}
+
+/* State to hide overlay, WebRTC communication is in progress and or is playing */
+.hiddenState{
+	display: none;
+}
+
+#playButton{
+	display: inline-block;
+	height: auto;
+}
+
+img#playButton{
+	max-width: 241px;
+	width: 10%;
+}
+
+#UIInteraction{
+	position: fixed;
+}
+
+#UIInteractionButtonBoundary{
+	padding: 2px;
+}
+
+#UIInteractionButton{
+	cursor: pointer;
+}
+
+#hiddenInput{
+	position: absolute;
+	left: -10%;   /* Although invisible, push off-screen to prevent user interaction. */
+	width: 0px;
+	opacity: 0;
+}
+
+#editTextButton{
+	position: absolute;
+	height: 40px;
+	width: 40px;
+}
+
+#overlayHeader{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	border-bottom: 1px solid var(--colour8);
+	background-color: var(--colour7);
+}
+
+section {
+	display: flex;
+	flex-direction: column;
+}
+
+section > :first-child{
+	background-color: var(--colour7);
+	padding: 4px;
+	font-weight: bold;
+	border-top: 1px solid var(--colour8);
+	border-bottom: 1px solid var(--colour8);
+	justify-content: space-between;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+}
+
+.overlay-button{
+	line-height: 1.1;
+	padding: 1px 6px;
+}
+
+.collapse {
+	padding-left: 5%;
+}
+
+input[type="number"]:disabled {
+	background: var(--colour7);
+	border: none;
+	color: var(--colour4);
+	cursor: not-allowed;
+}
+
+select {
+	text-align: right;
+}
+
+input {
+	text-align: right;
+}
+
+.form-control {
+	background-color: var(--colour6);
+	border: 2px solid var(--colour7);
+	border-radius: 4px;
+	color: var(--colour4);
+}
+
+.form-control:hover {
+	border-color: var(--colour4);
+}
+
+.form-group {
+	padding-top: 4px;
+	display: grid;
+	grid-template-columns: 50% 50%;
+	row-gap: 4px;
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+.form-group label {
+	color: var(--colour4);
+	vertical-align: middle;
+	font-weight: normal;
+}
+
+#freezeFrameOverlay {
+	background-color: transparent;
+}
+
+.freezeframeBackground {
+	background-color: #000 !important;
+}

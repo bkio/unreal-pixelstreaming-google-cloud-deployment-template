@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <style>
+        body {
+            font-size: 16px;
+        }
+
+        #background {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            z-index: 0;
+        }
+
+        .stretch {
+            width: 100%;
+            height: 100%;
+        }
+
+        .container {
+            float: left;
+            position: absolute;
+            top: 0%;
+            left: 50%;
+        }
+
+        .fixer-container {
+            float: left;
+            position: relative;
+            left: -50%;
+            transform-origin: top;
+        }
+
+        img {
+            border: 1px dotted #4CAF50; /* Green */
+        }
+
+        input {
+            border: 2px solid #4CAF50; /* Green */
+            padding: 15px 32px;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: text;
+            font-weight: 600;
+            text-align: center;
+            font-size: 100%;
+        }
+
+        select {
+            font-size: 100%;
+        }
+
+        input:disabled {
+            cursor: not-allowed;
+            background-color: dimgray;
+        }
+
+        button {
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            background-color: #4CAF50; /* Green */
+        }
+
+        button:disabled {
+            color: white;
+            cursor: not-allowed;
+            background-color: dimgray;
+        }
+
+        .page-element {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript">
+        function setCookie(cname, cvalue, exminutes) {
+
+            const d = new Date();
+            d.setTime(d.getTime() + (exminutes * 60 * 1000));
+
+            let expires = "expires=" + d.toUTCString();
+
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+        function load() {
+
+            var captchaInput = document.getElementById("captcha-input");
+            var submitButton = document.getElementById("captcha-submit-button");
+
+            var clickedSubmit = function () {
+                if (captchaInput.value.length !== 5) return;
+
+                setCookie("${{CAPTCHA_CODE_VERIFICATION_COOKIE_NAME}}", captchaInput.value, ${{CAPTCHA_CODE_VERIFICATION_COOKIE_EXPIRES_AFTER_MINUTES}});
+
+                captchaInput.value = "";
+                submitButton.disabled = true;
+                captchaInput.disabled = true;
+                window.location.reload();
+            };
+
+            submitButton.addEventListener("click", clickedSubmit);
+
+            captchaInput.addEventListener("input", function (e) {
+                submitButton.disabled = e.target.value.length !== 5;
+            });
+
+            captchaInput.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    clickedSubmit();
+                }
+            });
+
+            var fixedContainerElement = document.getElementsByClassName("fixer-container")[0];
+            console.log(fixedContainerElement);
+            var initialCssOfFixedContainer = fixedContainerElement.style.cssText;
+
+            calculateNewScale = function() {
+                var percentageOn = document.body.clientWidth / 1920;
+                percentageOn = Math.max(Math.min(percentageOn * 3, 1), 0);
+                fixedContainerElement.style.cssText = initialCssOfFixedContainer + "-moz-transform:scale("+percentageOn+");-webkit-transform:scale("+percentageOn +");transform:scale("+percentageOn +");";
+            }
+
+            calculateNewScale();
+            window.addEventListener("resize", calculateNewScale);
+        }
+    </script>
+</head>
+
+<body onload="load()">
+    <div id="background">
+        <img src="https://storage.googleapis.com/burak-public-bucket/Office_Thumbnail.png" class="stretch" alt="" />
+    </div>
+    <div class="container">
+        <div class="fixer-container">
+            <div id="captcha-image" class="page-element">
+                <img src="data:image/png;base64,${{IMAGE_BASE_64}}">
+            </div>
+            <div class="page-element">
+                <input type="text" id="captcha-input" name="captcha-input" minlength="5" maxlength="5" size="7" pattern="[A-Za-z0-9]" placeholder="Fill here..." required />
+            </div>
+            <div class="page-element">
+                <button id="captcha-submit-button" disabled>Submit</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

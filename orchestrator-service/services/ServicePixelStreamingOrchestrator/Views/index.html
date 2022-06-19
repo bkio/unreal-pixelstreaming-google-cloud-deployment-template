@@ -1,0 +1,50 @@
+<!-- Copyright Epic Games, Inc. All Rights Reserved. -->
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<link type="text/css" rel="stylesheet" href="index.css">
+	<script type="text/javascript">
+		// This horrible hack is to make Fippo's adapter-latest.js work with Firefox when not on https
+		// because FF does not let you access navigator.mediaDevices when on http.
+		var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+		if (isFirefox) {
+			window.navigator.mozGetUserMedia = function () { };
+			if (window.navigator.mediaDevices === undefined) {
+				navigator.mediaDevices = {};
+				navigator.mediaDevices.getSupportedConstraints = function () { return {}; };
+				navigator.mediaDevices.getUserMedia = function () { return {}; };
+			}
+		}
+	</script>
+	<script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+	<script type="text/javascript" src="https://richtr.github.io/NoSleep.js/dist/NoSleep.min.js"></script>
+	<script type="text/javascript" src="scripts/webRtcPlayer.js"></script>
+	<script type="text/javascript" src="scripts/app.js"></script>
+</head>
+
+<body onload="load()">
+	<div id="playerUI">
+		<div id="player"></div>
+		<div id="overlay" class="overlay text-light bg-dark">
+			<div id="overlayHeader">
+				<div id="qualityStatus" class="greyStatus">
+					<img id="qualityStatusImg" src="images/network_gray.png">
+				</div>
+				<br />
+				<div id="fullscreenButton" class="greyStatus">
+					<img id="fullscreenImg" src="images/fullscreen_gray.png">
+				</div>
+			</div>
+			<div id="overlaySettings">
+				<section id="statsPanel">
+					<div id="statsContainer" class="statsContainer">
+						<div id="stats" class="stats"></div>
+					</div>
+				</section>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,100 @@
+name: unreal-pixelstreaming-gc-deploy
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  TF_VAR_GITHUB_UNIQUE_BUILD_NUMBER: $((${{ github.run_number }} * 100 + ${{ github.run_attempt }})) 
+  TF_VAR_TERRAFORM_STATE_BUCKET: ${{ secrets.TERRAFORM_STATE_BUCKET }}
+  TF_VAR_GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+  TF_VAR_VM_ZONES: ${{ secrets.VM_ZONES }}
+  TF_VAR_VM_NAME_PREFIX: ${{ secrets.VM_NAME_PREFIX }}
+  TF_VAR_ORCHESTRATOR_VM_INSTALL_SH_FILE_PATH: "/../install_prerequisites-gc-orchestrator-vm.sh"
+  TF_VAR_GPU_VM_INSTALL_SH_FILE_PATH: "/../install_prerequisites-gc-gpu-vm.sh"
+  TF_VAR_DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+  GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@v0
+      with:
+        service_account_email: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+        service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
+        export_default_credentials: true
+
+    # Configure Docker with Credentials
+    - name: Orchestrator - Configure Docker
+      run: |
+        gcloud auth configure-docker
+    
+      # Setup dotnet env.
+    - uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '3.1.x'
+
+    # Build the Dotnet binaries and build docker image and publish
+    - name: Orchestrator - Build and Publish
+      working-directory: orchestrator-service/services/ServicePixelStreamingOrchestrator
+      run: |
+        mkdir output
+        dotnet restore ServicePixelStreamingOrchestrator.csproj
+        dotnet publish ServicePixelStreamingOrchestrator.csproj --runtime alpine-x64 --configuration Release --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o output/app/out
+        
+        cp Dockerfile output
+        cp -r Views output/public
+
+        cd output
+        
+        gcloud config set project ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+        gcloud builds submit --tag gcr.io/${{ secrets.GOOGLE_CLOUD_PROJECT }}/${{ secrets.ORCHESTRATOR_CONTAINER_NAME }}:latest
+
+    # Setup terraform env.
+    - name: HashiCorp - Setup Terraform
+      uses: hashicorp/setup-terraform@v2.0.0
+      with:
+        terraform_version: 1.1.7
+
+    # Rewrite Terraform configuration files to a canonical format and style
+    - name: Terraform fmt
+      working-directory: terraform
+      id: fmt
+      run: terraform fmt -check
+
+    - name: Terraform Init
+      working-directory: terraform
+      id: init
+      run: terraform init
+
+    - name: Terraform Validate
+      working-directory: terraform
+      id: validate
+      run: terraform validate -no-color
+
+    - name: Terraform Plan
+      working-directory: terraform
+      id: plan
+      run: terraform plan -no-color -input=false
+
+    - name: Terraform Apply
+      working-directory: terraform
+      id: apply
+      run: terraform apply -auto-approve -input=false
+
+    # Deploy the orchestrator image to the Cloud Run
+    - name: Orchestrator - Deploy
+      run: |
+        export ORCHESTRATOR_VM_ZONE="$(cut -d'_' -f1 <<<"${{ secrets.VM_ZONES }}")"
+        export GOOGLE_PLAIN_CREDENTIALS=`echo -n ${{ secrets.GOOGLE_CREDENTIALS }} | od -A n -t x1 | sed 's/ *//g'`
+        export COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY=$(terraform output INSTANCES_PRIVATE_SSH_KEY)
+        gcloud compute ssh --project=${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.VM_NAME_PREFIX }}-orchestrator --zone=$ORCHESTRATOR_VM_ZONE --quiet --command="sudo bash /opt/scripts/docker_update.sh 8080 ${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.ORCHESTRATOR_CONTAINER_NAME }} ServicePixelStreamingOrchestrator ${{ secrets.VM_ZONES }} ${{ secrets.VM_NAME_PREFIX }} ${{ secrets.PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME }} ${{ secrets.MAX_USER_SESSION_PER_INSTANCE }} $COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY $GOOGLE_PLAIN_CREDENTIALS"

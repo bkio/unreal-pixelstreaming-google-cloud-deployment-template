@@ -1,0 +1,3 @@
+[submodule "submodules/utilities-dotnet-framework"]
+	path = submodules/utilities-dotnet-framework
+	url = git@github.com:bkio/utilities-dotnet-framework.git

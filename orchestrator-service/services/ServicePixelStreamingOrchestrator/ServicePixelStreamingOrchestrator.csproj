@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <StartupObject>ServicePixelStreamingOrchestrator.Program</StartupObject>
+    <Configurations>Debug;Release</Configurations>
+	<BaseOutputPath>$(SolutionDir)binaries\</BaseOutputPath>
+	<OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="app\**" />
+    <EmbeddedResource Remove="app\**" />
+    <None Remove="app\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SixLaborsCaptcha.Core" Version="0.2.0" />
+    <PackageReference Include="SSH.NET" Version="2020.0.2" />
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.15.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\submodules\utilities-dotnet-framework\cloud-connectors\cloud-connector-vm-service-gc\CloudConnector_VMService_GC.csproj" />
+    <ProjectReference Include="..\..\..\submodules\utilities-dotnet-framework\utilities\web-service\web-service-utilities-basic\WebServiceUtilities_Basic.csproj" />
+  </ItemGroup>
+
+</Project>

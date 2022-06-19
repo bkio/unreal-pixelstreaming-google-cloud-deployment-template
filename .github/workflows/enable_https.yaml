@@ -1,0 +1,24 @@
+name: Enable HTTPS on the Orchestrator VM
+
+on: [workflow_dispatch]
+
+env:
+  GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+jobs:
+  enable-https:
+    name: Authenticate to VM and Enable HTTPS
+    runs-on: ubuntu-latest
+    steps:
+      # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@v0
+      with:
+        service_account_email: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+        service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
+        export_default_credentials: true
+
+      # Deploy the orchestrator image to the Cloud Run
+    - name: Task Execution
+      run: |
+        export ORCHESTRATOR_VM_ZONE="$(cut -d'_' -f1 <<<"${{ secrets.VM_ZONES }}")"
+        gcloud compute ssh --project=${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.VM_NAME_PREFIX }}-orchestrator --zone=$ORCHESTRATOR_VM_ZONE --quiet --command="sudo bash /opt/scripts/enable_https.sh"
