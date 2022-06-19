@@ -2,9 +2,6 @@ provider "google" {
   project = var.GOOGLE_CLOUD_PROJECT_ID
 }
 
-provider "tls" {
-}
-
 resource "tls_private_key" "orchestrator_ssh_key_ed25519" {
   algorithm = "ED25519"
 }

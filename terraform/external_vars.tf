@@ -4,10 +4,6 @@ variable "GITHUB_UNIQUE_BUILD_NUMBER" {
   type = string
 }
 
-variable "TERRAFORM_STATE_BUCKET" {
-  type = string
-}
-
 variable "GOOGLE_CLOUD_PROJECT_ID" {
   type = string
 }

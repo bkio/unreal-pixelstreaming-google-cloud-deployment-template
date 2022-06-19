@@ -1,7 +1,6 @@
 ### Google Cloud related variables
 locals {
-  TERRAFORM_STATE_PREFIX                                    = "terraform/state-${var.VM_NAME_PREFIX}"
-  DECODED_VM_ZONES                                          = split(",", var.VM_ZONES)
+  DECODED_VM_ZONES = split(",", var.VM_ZONES)
 }
 
 ### Adding remote state storage
@@ -9,34 +8,31 @@ terraform {
   required_version = ">=0.14.3"
   required_providers {
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = "4.25.0"
     }
     tls = {
-      source = "hashicorp/tls"
+      source  = "hashicorp/tls"
       version = "3.4.0"
     }
   }
-  backend "gcs" {
-   bucket  = var.TERRAFORM_STATE_BUCKET
-   prefix  = local.TERRAFORM_STATE_PREFIX
- }
+  backend "gcs" {}
 }
 
 module "gce" {
-  source                                                    = "./gce"
-  
-  GITHUB_UNIQUE_BUILD_NUMBER                                = var.GITHUB_UNIQUE_BUILD_NUMBER
+  source = "./gce"
 
-  GOOGLE_CLOUD_PROJECT_ID                                   = var.GOOGLE_CLOUD_PROJECT_ID
+  GITHUB_UNIQUE_BUILD_NUMBER = var.GITHUB_UNIQUE_BUILD_NUMBER
 
-  VM_ZONES                                                  = var.DECODED_VM_ZONES
-  VM_NAME_PREFIX                                            = var.VM_NAME_PREFIX
+  GOOGLE_CLOUD_PROJECT_ID = var.GOOGLE_CLOUD_PROJECT_ID
 
-  ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT                   = file("${path.module}${var.ORCHESTRATOR_VM_INSTALL_SH_FILE_PATH}")
-  GPU_VM_INSTALL_SH_FILE_CONTENT                            = file("${path.module}${var.GPU_VM_INSTALL_SH_FILE_PATH}")
+  VM_ZONES       = var.DECODED_VM_ZONES
+  VM_NAME_PREFIX = var.VM_NAME_PREFIX
 
-  DOMAIN_NAME                                               = var.DOMAIN_NAME
+  ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT = file("${path.module}${var.ORCHESTRATOR_VM_INSTALL_SH_FILE_PATH}")
+  GPU_VM_INSTALL_SH_FILE_CONTENT          = file("${path.module}${var.GPU_VM_INSTALL_SH_FILE_PATH}")
+
+  DOMAIN_NAME = var.DOMAIN_NAME
 }
 
 #Outputs to second pass

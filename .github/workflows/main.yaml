@@ -6,8 +6,7 @@ on:
       - master
 
 env:
-  TF_VAR_GITHUB_UNIQUE_BUILD_NUMBER: $((${{ github.run_number }} * 100 + ${{ github.run_attempt }})) 
-  TF_VAR_TERRAFORM_STATE_BUCKET: ${{ secrets.TERRAFORM_STATE_BUCKET }}
+  TF_VAR_GITHUB_UNIQUE_BUILD_NUMBER: $((${{ github.run_number }} * 100 + ${{ github.run_attempt }}))
   TF_VAR_GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
   TF_VAR_VM_ZONES: ${{ secrets.VM_ZONES }}
   TF_VAR_VM_NAME_PREFIX: ${{ secrets.VM_NAME_PREFIX }}
@@ -33,32 +32,6 @@ jobs:
         service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
         export_default_credentials: true
 
-    # Configure Docker with Credentials
-    - name: Orchestrator - Configure Docker
-      run: |
-        gcloud auth configure-docker
-    
-      # Setup dotnet env.
-    - uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: '3.1.x'
-
-    # Build the Dotnet binaries and build docker image and publish
-    - name: Orchestrator - Build and Publish
-      working-directory: orchestrator-service/services/ServicePixelStreamingOrchestrator
-      run: |
-        mkdir output
-        dotnet restore ServicePixelStreamingOrchestrator.csproj
-        dotnet publish ServicePixelStreamingOrchestrator.csproj --runtime alpine-x64 --configuration Release --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o output/app/out
-        
-        cp Dockerfile output
-        cp -r Views output/public
-
-        cd output
-        
-        gcloud config set project ${{ secrets.GOOGLE_CLOUD_PROJECT }}
-        gcloud builds submit --tag gcr.io/${{ secrets.GOOGLE_CLOUD_PROJECT }}/${{ secrets.ORCHESTRATOR_CONTAINER_NAME }}:latest
-
     # Setup terraform env.
     - name: HashiCorp - Setup Terraform
       uses: hashicorp/setup-terraform@v2.0.0
@@ -74,12 +47,11 @@ jobs:
     - name: Terraform Init
       working-directory: terraform
       id: init
-      run: terraform init
+      run: terraform init -backend-config="bucket=${{ secrets.TERRAFORM_STATE_BUCKET }}" -backend-config="prefix=terraform/state-${{ secrets.VM_NAME_PREFIX }}"
 
     - name: Terraform Validate
-      working-directory: terraform
       id: validate
-      run: terraform validate -no-color
+      run: cd terraform && terraform validate -no-color
 
     - name: Terraform Plan
       working-directory: terraform
