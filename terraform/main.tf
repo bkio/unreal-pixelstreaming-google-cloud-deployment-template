@@ -33,13 +33,11 @@ module "gce" {
   DOMAIN_NAME = var.DOMAIN_NAME
 }
 
-#Outputs to second pass
-
 output "INSTANCES_PRIVATE_SSH_KEY" {
   value = module.gce.INSTANCES_PRIVATE_SSH_KEY
   sensitive = true
 }
 
-#output "GPU_INSTANCES_NAMES" {
-  #value = module.gce.GPU_INSTANCES_NAMES
-#}
+output "GPU_INSTANCES_NAMES" {
+  value = module.gce.GPU_INSTANCES_NAMES
+}
