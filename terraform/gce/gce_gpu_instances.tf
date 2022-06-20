@@ -64,6 +64,10 @@ resource "null_resource" "post_gpu_vm_creation_create_local_file" {
 }
 
 resource "null_resource" "post_gpu_vm_creation_copy_and_execute_script" {
+  triggers = {
+    instance_list = join(",", google_compute_instance.gpu_vms.*.id)
+  }
+
   connection {
     type = "ssh"
     user = "orchestrator"
@@ -78,7 +82,6 @@ resource "null_resource" "post_gpu_vm_creation_copy_and_execute_script" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo gcloud components install docker-credential-gcr --quiet",
       "gcloud auth configure-docker gcr.io --quiet --project=${var.GOOGLE_CLOUD_PROJECT_ID}",
       "chmod +x /tmp/install_script_gpu_vm.sh",
       "sudo bash /tmp/install_script_gpu_vm.sh"

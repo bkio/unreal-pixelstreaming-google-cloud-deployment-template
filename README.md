@@ -4,6 +4,10 @@ First of all, fork this repository and set up the Github Action Secrets accordin
 
 Run github workflow dispatch called "Terraform Create"; then terraform will set up the environment. When it is complete, check your orchestrator vm's (gateway) public IP address. Then set A records with your domain name in your domain provider system; when you are sure that the records are acknowledged; run github workflow dispatch called "Enable HTTPS on the Orchestrator VM". Then it is all done.
 If you want to destroy your environment, simply call workflow dispatch "Terraform Destroy".
+
+Pixel streaming frontend files are located at orchestrator-service/services/ServicePixelStreamingOrchestrator/Views/ ; feel free to play with the files. Currently it is optimized for both desktop and mobile experience.
+
+You can also find embedding example at orchestrator-service/services/ServicePixelStreamingOrchestrator/Examples ; it is tailored for embedding the frontend (served at $DOMAIN_NAME) into wordpress-elementor setup; but it is very generic so it can be used in other frontend solutions as well.
 ___
 ___
 ## Required environment variables to be set in Github Actions Secrets:

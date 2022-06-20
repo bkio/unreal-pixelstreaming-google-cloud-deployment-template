@@ -2,10 +2,12 @@ locals {
   GCE_ORCHESTRATOR_PUBLIC_IP_RESOURCE_NAME = "${var.VM_NAME_PREFIX}-orchestrator-public-ip"
   GCE_ORCHESTRATOR_VM_RESOURCE_NAME = "${var.VM_NAME_PREFIX}-orchestrator-vm"
   GCE_ORCHESTRATOR_VM_ZONE = element(var.VM_ZONES, 0)
+  GCE_ORCHESTRATOR_VM_REGION = join("-", slice(split("-", local.GCE_ORCHESTRATOR_VM_ZONE), 0, length(split("-", local.GCE_ORCHESTRATOR_VM_ZONE)) - 1))
 }
 
 resource "google_compute_address" "orchestrator_static_ip_address" {
   name = local.GCE_ORCHESTRATOR_PUBLIC_IP_RESOURCE_NAME
+  region = local.GCE_ORCHESTRATOR_VM_REGION
 }
 
 data "google_compute_image" "orchestrator_vm_image" {
@@ -58,6 +60,10 @@ resource "null_resource" "post_orchestrator_vm_creation_create_local_file" {
 }
 
 resource "null_resource" "post_orchestrator_vm_creation_copy_and_execute_script" {
+  triggers = {
+    instance = google_compute_instance.orchestrator.id
+  }
+  
   connection {
     type = "ssh"
     user = "orchestrator"
@@ -72,7 +78,6 @@ resource "null_resource" "post_orchestrator_vm_creation_copy_and_execute_script"
 
   provisioner "remote-exec" {
     inline = [
-      "sudo gcloud components install docker-credential-gcr --quiet",
       "chmod +x /tmp/install_script_orchestrator_vm.sh",
       "sudo bash /tmp/install_script_orchestrator_vm.sh"
     ]
