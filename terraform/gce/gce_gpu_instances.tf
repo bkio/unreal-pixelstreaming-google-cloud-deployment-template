@@ -87,5 +87,5 @@ resource "null_resource" "post_gpu_vm_creation_copy_and_execute_script" {
 
   count = length(google_compute_instance.gpu_vms)
 
-  depends_on = [ google_compute_instance.gpu_vms[count.index], null_resource.post_gpu_vm_creation_create_local_file ]
+  depends_on = [ null_resource.post_gpu_vm_creation_create_local_file ]
 }

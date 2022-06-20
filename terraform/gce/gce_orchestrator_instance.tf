@@ -78,5 +78,5 @@ resource "null_resource" "post_orchestrator_vm_creation_copy_and_execute_script"
     ]
   }
 
-  depends_on = [ google_compute_instance.orchestrator, null_resource.post_orchestrator_vm_creation_create_local_file ]
+  depends_on = [ null_resource.post_orchestrator_vm_creation_create_local_file ]
 }
