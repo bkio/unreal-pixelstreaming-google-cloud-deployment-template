@@ -57,21 +57,13 @@ resource "google_compute_instance" "gpu_vms" {
   depends_on = [ google_compute_firewall.allow_ssh ]
 }
 
-resource "google_storage_bucket_object" "gpu_vm_install_sh" {
-  name   = "scripts-${var.VM_NAME_PREFIX}/gpu_vm_install.sh"
-  content = var.GPU_VM_INSTALL_SH_FILE_CONTENT
-  bucket = var.TERRAFORM_STATE_BUCKET
-  cache_control = "no-cache,max-age=0"
-  content_type  = "application/x-shellscript"
-}
-data "google_storage_object_signed_url" "gpu_vm_install_sh_signed_url" {
-  bucket = var.TERRAFORM_STATE_BUCKET
-  path   = google_storage_bucket_object.gpu_vm_install_sh.name
-  http_method = "GET"
-  duration = "5m"
+resource "null_resource" "post_gpu_vm_creation_create_local_file" {
+  provisioner "local-exec" {
+    command = "echo '${var.GPU_VM_INSTALL_SH_FILE_CONTENT}' > install_script_gpu_vm.sh"
+  }
 }
 
-resource "null_resource" "post_gpu_vms_creation" {
+resource "null_resource" "post_gpu_vm_creation_copy_and_execute_script" {
   connection {
     type = "ssh"
     user = "orchestrator"
@@ -79,16 +71,21 @@ resource "null_resource" "post_gpu_vms_creation" {
     private_key = local.SSH_PRIVATE_KEY
   }
 
+  provisioner "file" {
+    source      = "install_script_gpu_vm.sh"
+    destination = "/tmp/install_script_gpu_vm.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
+      "sudo gcloud components install docker-credential-gcr --quiet",
       "gcloud auth configure-docker gcr.io --quiet --project=${var.GOOGLE_CLOUD_PROJECT_ID}",
-      "curl -o install_script.sh ${data.google_storage_object_signed_url.gpu_vm_install_sh_signed_url.signed_url}",
-      "chmod +x install_script.sh",
-      "sudo bash install_script.sh"
+      "chmod +x /tmp/install_script_gpu_vm.sh",
+      "sudo bash /tmp/install_script_gpu_vm.sh"
     ]
   }
 
   count = length(google_compute_instance.gpu_vms)
 
-  depends_on = [ google_compute_instance.gpu_vms, google_storage_bucket_object.gpu_vm_install_sh ]
+  depends_on = [ google_compute_instance.gpu_vms[count.index], null_resource.post_gpu_vm_creation_create_local_file ]
 }

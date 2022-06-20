@@ -31,8 +31,6 @@ module "gce" {
   GPU_VM_INSTALL_SH_FILE_CONTENT          = file("${path.module}${var.GPU_VM_INSTALL_SH_FILE_PATH}")
 
   DOMAIN_NAME = var.DOMAIN_NAME
-
-  TERRAFORM_STATE_BUCKET = var.TERRAFORM_STATE_BUCKET
 }
 
 #Outputs to second pass

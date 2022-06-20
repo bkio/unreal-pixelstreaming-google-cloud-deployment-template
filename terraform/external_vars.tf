@@ -23,7 +23,3 @@ variable "GPU_VM_INSTALL_SH_FILE_PATH" {
 variable "DOMAIN_NAME" {
   type = string
 }
-
-variable "TERRAFORM_STATE_BUCKET" {
-  type = string
-}
