@@ -39,4 +39,5 @@ module "gce" {
 
 output "INSTANCES_PRIVATE_SSH_KEY" {
   value = module.gce.INSTANCES_PRIVATE_SSH_KEY
+  sensitive = true
 }
