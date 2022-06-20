@@ -51,9 +51,23 @@ resource "google_compute_instance" "orchestrator" {
   depends_on = [ google_compute_firewall.allow_ssh ]
 }
 
+resource "google_storage_bucket_object" "orchestrator_vm_install_sh" {
+  name   = "scripts-${var.VM_NAME_PREFIX}/orchestrator_vm_install.sh"
+  content = replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME)
+  bucket = var.TERRAFORM_STATE_BUCKET
+  cache_control = "no-cache,max-age=0"
+  content_type  = "application/x-shellscript"
+}
+data "google_storage_object_signed_url" "orchestrator_vm_install_sh_signed_url" {
+  bucket = var.TERRAFORM_STATE_BUCKET
+  path   = google_storage_bucket_object.orchestrator_vm_install_sh.name
+  http_method = "GET"
+  duration = "5m"
+}
+
 resource "null_resource" "post_orchestrator_vm_creation" {
   provisioner "local-exec" {
-    command = replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME)
+    command = "echo '${local.SSH_PRIVATE_KEY}' | ssh -i /dev/stdin -o StrictHostKeyChecking=accept-new -o ConnectTimeout=120 orchestrator@${google_compute_instance.gpu_vms[count.index].network_interface.0.access_config.0.nat_ip} 'curl -o install_script.sh ${google_storage_object_signed_url.orchestrator_vm_install_sh_signed_url.signed_url} && chmod +x install_script.sh && sudo bash install_script.sh'"
   }
-  depends_on = [ google_compute_instance.orchestrator ]
+  depends_on = [ google_compute_instance.orchestrator, google_storage_bucket_object.orchestrator_vm_install_sh ]
 }
