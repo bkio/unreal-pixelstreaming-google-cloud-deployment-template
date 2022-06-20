@@ -41,7 +41,7 @@ resource "google_compute_instance" "orchestrator" {
     }
   }
 
-  metadata {
+  metadata = {
     startup-script = replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME)
   }
 

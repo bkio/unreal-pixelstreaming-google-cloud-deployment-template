@@ -51,16 +51,3 @@ jobs:
       working-directory: terraform
       id: plan
       run: terraform plan -no-color -input=false
-
-    - name: Terraform Apply
-      working-directory: terraform
-      id: apply
-      run: terraform apply -auto-approve -input=false
-
-    # Deploy the orchestrator image to the Cloud Run
-    - name: Orchestrator - Deploy
-      run: |
-        export ORCHESTRATOR_VM_ZONE="$(cut -d'_' -f1 <<<"${{ secrets.VM_ZONES }}")"
-        export GOOGLE_PLAIN_CREDENTIALS=`echo -n ${{ secrets.GOOGLE_CREDENTIALS }} | od -A n -t x1 | sed 's/ *//g'`
-        export COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY=$(terraform output INSTANCES_PRIVATE_SSH_KEY)
-        gcloud compute ssh --project=${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.VM_NAME_PREFIX }}-orchestrator --zone=$ORCHESTRATOR_VM_ZONE --quiet --command="sudo bash /opt/scripts/docker_update.sh 8080 ${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.ORCHESTRATOR_CONTAINER_NAME }} ServicePixelStreamingOrchestrator ${{ secrets.VM_ZONES }} ${{ secrets.VM_NAME_PREFIX }} ${{ secrets.PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME }} ${{ secrets.MAX_USER_SESSION_PER_INSTANCE }} $COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY $GOOGLE_PLAIN_CREDENTIALS"
