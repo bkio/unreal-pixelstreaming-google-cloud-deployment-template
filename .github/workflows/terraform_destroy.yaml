@@ -9,6 +9,7 @@ env:
   TF_VAR_ORCHESTRATOR_VM_INSTALL_SH_FILE_PATH: "/../install_prerequisites-gc-orchestrator-vm.sh"
   TF_VAR_GPU_VM_INSTALL_SH_FILE_PATH: "/../install_prerequisites-gc-gpu-vm.sh"
   TF_VAR_DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+  TF_VAR_TERRAFORM_STATE_BUCKET: ${{ secrets.TERRAFORM_STATE_BUCKET }}
   GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
 jobs:
