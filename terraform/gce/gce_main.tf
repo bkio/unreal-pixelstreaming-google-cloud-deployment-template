@@ -13,3 +13,7 @@ locals {
 output "INSTANCES_PRIVATE_SSH_KEY" {
   value = local.SSH_PRIVATE_KEY
 }
+
+output "GPU_INSTANCES_PUBLIC_IP_ADDRESSES" {
+  value = ["${google_compute_instance.gpu_vms[*].network_interface.0.access_config.0.nat_ip}"]
+}

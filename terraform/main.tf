@@ -22,8 +22,6 @@ terraform {
 module "gce" {
   source = "./gce"
 
-  GITHUB_UNIQUE_BUILD_NUMBER = var.GITHUB_UNIQUE_BUILD_NUMBER
-
   GOOGLE_CLOUD_PROJECT_ID = var.GOOGLE_CLOUD_PROJECT_ID
 
   VM_ZONES       = local.DECODED_VM_ZONES
@@ -40,4 +38,8 @@ module "gce" {
 output "INSTANCES_PRIVATE_SSH_KEY" {
   value = module.gce.INSTANCES_PRIVATE_SSH_KEY
   sensitive = true
+}
+
+output "GPU_INSTANCES_PUBLIC_IP_ADDRESSES" {
+  value = moduke.gce.GPU_INSTANCES_PUBLIC_IP_ADDRESSES
 }

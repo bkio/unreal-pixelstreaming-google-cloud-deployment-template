@@ -6,7 +6,6 @@ on:
       - master
 
 env:
-  TF_VAR_GITHUB_UNIQUE_BUILD_NUMBER: $((${{ github.run_number }} * 100 + ${{ github.run_attempt }}))
   TF_VAR_GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
   TF_VAR_VM_ZONES: ${{ secrets.VM_ZONES }}
   TF_VAR_VM_NAME_PREFIX: ${{ secrets.VM_NAME_PREFIX }}
