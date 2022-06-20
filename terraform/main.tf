@@ -37,6 +37,6 @@ module "gce" {
 
 #Outputs to second pass
 
-output "GPU_INSTANCES_SSH_KEY" {
-  value = module.gce.GPU_INSTANCES_SSH_KEY
+output "INSTANCES_PRIVATE_SSH_KEY" {
+  value = module.gce.INSTANCES_PRIVATE_SSH_KEY
 }

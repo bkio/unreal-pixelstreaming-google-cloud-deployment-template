@@ -37,7 +37,7 @@ resource "google_compute_instance" "orchestrator" {
     subnetwork = google_compute_subnetwork.subnets[0].name
     access_config {
       nat_ip = google_compute_address.orchestrator_static_ip_address.address
-      network_tier = STANDARD
+      network_tier = "STANDARD"
     }
   }
 

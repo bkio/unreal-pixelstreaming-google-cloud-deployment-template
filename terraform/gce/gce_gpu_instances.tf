@@ -32,7 +32,7 @@ resource "google_compute_instance" "gpu_vms" {
     subnetwork = google_compute_subnetwork.subnets[count.index].name
     access_config {
       # Ephemeral
-      network_tier = STANDARD
+      network_tier = "STANDARD"
     }
   }
 
@@ -56,6 +56,7 @@ resource "google_compute_instance" "gpu_vms" {
 
   provisioner "remote-exec" {
     connection {
+      host        = google_compute_instance.gpu_vms[count.index].network_interface.0.access_config.0.nat_ip
       type        = "ssh"
       user        = "orchestrator"
       timeout     = "500s"
