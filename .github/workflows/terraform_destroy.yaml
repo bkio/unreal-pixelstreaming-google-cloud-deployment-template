@@ -3,6 +3,12 @@ name: Terraform Destroy
 on: [workflow_dispatch]
 
 env:
+  TF_VAR_GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+  TF_VAR_VM_ZONES: ${{ secrets.VM_ZONES }}
+  TF_VAR_VM_NAME_PREFIX: ${{ secrets.VM_NAME_PREFIX }}
+  TF_VAR_ORCHESTRATOR_VM_INSTALL_SH_FILE_PATH: "/../install_prerequisites-gc-orchestrator-vm.sh"
+  TF_VAR_GPU_VM_INSTALL_SH_FILE_PATH: "/../install_prerequisites-gc-gpu-vm.sh"
+  TF_VAR_DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
   GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
 jobs:
@@ -26,6 +32,11 @@ jobs:
       working-directory: terraform
       id: init
       run: terraform init -backend-config="bucket=${{ secrets.TERRAFORM_STATE_BUCKET }}" -backend-config="prefix=terraform/state-${{ secrets.VM_NAME_PREFIX }}"
+
+    - name: Terraform Destroy Plan
+      working-directory: terraform
+      id: plan
+      run: terraform plan -destroy -input=false
 
     - name: Terraform Destroy Apply
       working-directory: terraform
