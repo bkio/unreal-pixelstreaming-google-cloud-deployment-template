@@ -54,19 +54,6 @@ resource "google_compute_instance" "gpu_vms" {
     provisioning_model = "SPOT"
   }
 
-  provisioner "remote-exec" {
-    connection {
-      host        = google_compute_instance.gpu_vms[count.index].network_interface.0.access_config.0.nat_ip
-      type        = "ssh"
-      user        = "orchestrator"
-      timeout     = "500s"
-      private_key = local.SSH_PRIVATE_KEY
-    }
-    inline = [
-      "gcloud auth configure-docker gcr.io --quiet --project=${var.GOOGLE_CLOUD_PROJECT_ID}"
-    ]
-  }
-  
   # Ensure firewall rule is provisioned before server, so that SSH doesn't fail.
   depends_on = [ google_compute_firewall.allow_ssh ]
 }
