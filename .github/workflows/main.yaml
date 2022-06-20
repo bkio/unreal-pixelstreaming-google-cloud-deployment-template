@@ -57,16 +57,13 @@ jobs:
       id: apply
       run: terraform apply -auto-approve -input=false
 
-    - name: Execute Docker Authorize
+    - name: Post Terraform Apply
       working-directory: terraform
       run: |
-        GPU_INSTANCES_PUBLIC_IP_ADDRESSES=$(terraform output -json GPU_INSTANCES_PUBLIC_IP_ADDRESSES)
-        COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY=$(terraform output INSTANCES_PRIVATE_SSH_KEY)
+        GPU_INSTANCES_NAMES=$(terraform output -json GPU_INSTANCES_NAMES)
 
-        sudo apt install -y jq
-
-        for current_ip in $(echo "${GPU_INSTANCES_PUBLIC_IP_ADDRESSES}" | jq -r '.[]'); do
-          echo $COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY | ssh -i /dev/stdin -o StrictHostKeyChecking=accept-new -o ConnectTimeout=120 orchestrator@${current_ip} 'gcloud auth configure-docker gcr.io --quiet --project=${{ secrets.GOOGLE_CLOUD_PROJECT }}'
+        for current_vm_name in $(echo "${GPU_INSTANCES_NAMES}" | jq -r '.[]'); do
+          gcloud compute instances stop ${current_vm_name} --project=${{ secrets.GOOGLE_CLOUD_PROJECT }}
         done
 
     # Deploy the orchestrator image to the Cloud Run

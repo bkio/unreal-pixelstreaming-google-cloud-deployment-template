@@ -40,6 +40,6 @@ output "INSTANCES_PRIVATE_SSH_KEY" {
   sensitive = true
 }
 
-output "GPU_INSTANCES_PUBLIC_IP_ADDRESSES" {
-  value = module.gce.GPU_INSTANCES_PUBLIC_IP_ADDRESSES
+output "GPU_INSTANCES_NAMES" {
+  value = module.gce.GPU_INSTANCES_NAMES
 }

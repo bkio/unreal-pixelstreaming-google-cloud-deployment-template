@@ -37,7 +37,6 @@ resource "google_compute_instance" "gpu_vms" {
   }
 
   metadata = {
-    startup-script = var.GPU_VM_INSTALL_SH_FILE_CONTENT
     ssh-keys = "orchestrator:${local.SSH_PUBLIC_KEY}"
   }
 
@@ -56,4 +55,15 @@ resource "google_compute_instance" "gpu_vms" {
 
   # Ensure firewall rule is provisioned before server, so that SSH doesn't fail.
   depends_on = [ google_compute_firewall.allow_ssh ]
+}
+
+resource "null_resource" "post_gpu_vms_creation" {
+  provisioner "local-exec" {
+    command = <<Settings
+      echo "${local.SSH_PRIVATE_KEY}" | ssh -i /dev/stdin -o StrictHostKeyChecking=accept-new -o ConnectTimeout=120 orchestrator@${google_compute_instance.gpu_vms[count.index].network_interface.0.access_config.0.nat_ip} 'gcloud auth configure-docker gcr.io --quiet --project="${var.GOOGLE_CLOUD_PROJECT_ID}"'
+      ${var.GPU_VM_INSTALL_SH_FILE_CONTENT}
+    Settings
+  }
+  count = length(google_compute_instance.gpu_vms)
+  depends_on = [ google_compute_instance.gpu_vms ]
 }

@@ -41,10 +41,6 @@ resource "google_compute_instance" "orchestrator" {
     }
   }
 
-  metadata = {
-    startup-script = replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME)
-  }
-
   scheduling {
     preemptible = false
     automatic_restart = true
@@ -53,4 +49,11 @@ resource "google_compute_instance" "orchestrator" {
 
   # Ensure firewall rule is provisioned before server, so that SSH doesn't fail.
   depends_on = [ google_compute_firewall.allow_ssh ]
+}
+
+resource "null_resource" "post_orchestrator_vm_creation" {
+  provisioner "local-exec" {
+    command = replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME)
+  }
+  depends_on = [ google_compute_instance.orchestrator ]
 }

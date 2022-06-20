@@ -30,4 +30,4 @@ jobs:
     - name: Terraform Destroy
       working-directory: terraform
       id: destroy
-      run: terraform destroy
+      run: terraform destroy -force
