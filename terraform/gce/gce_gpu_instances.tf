@@ -24,10 +24,6 @@ resource "google_compute_instance" "gpu_vms" {
     }
   }
 
-  scratch_disk {
-    interface = "SCSI"
-  }
-
   network_interface {
     subnetwork = google_compute_subnetwork.subnets[count.index].name
     access_config {

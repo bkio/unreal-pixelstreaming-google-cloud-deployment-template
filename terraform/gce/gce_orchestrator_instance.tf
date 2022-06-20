@@ -31,10 +31,6 @@ resource "google_compute_instance" "orchestrator" {
     }
   }
 
-  scratch_disk {
-    interface = "SCSI"
-  }
-
   network_interface {
     subnetwork = google_compute_subnetwork.subnets[0].name
     access_config {
