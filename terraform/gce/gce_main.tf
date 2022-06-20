@@ -14,6 +14,6 @@ output "INSTANCES_PRIVATE_SSH_KEY" {
   value = local.SSH_PRIVATE_KEY
 }
 
-output "GPU_INSTANCES_NAMES" {
-  value = ["${google_compute_instance.gpu_vms[*].name}"]
-}
+#output "GPU_INSTANCES_NAMES" {
+  #value = ["${google_compute_instance.gpu_vms[*].name}"]
+#}
