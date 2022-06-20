@@ -27,11 +27,6 @@ jobs:
       id: init
       run: terraform init -backend-config="bucket=${{ secrets.TERRAFORM_STATE_BUCKET }}" -backend-config="prefix=terraform/state-${{ secrets.VM_NAME_PREFIX }}"
 
-    - name: Terraform Destroy Plan
-      working-directory: terraform
-      id: plan
-      run: terraform plan -destroy -input=false
-
     - name: Terraform Destroy Apply
       working-directory: terraform
       id: apply
