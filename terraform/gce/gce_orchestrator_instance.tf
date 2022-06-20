@@ -66,8 +66,20 @@ data "google_storage_object_signed_url" "orchestrator_vm_install_sh_signed_url" 
 }
 
 resource "null_resource" "post_orchestrator_vm_creation" {
-  provisioner "local-exec" {
-    command = "echo '${local.SSH_PRIVATE_KEY}' | ssh -i /dev/stdin -o StrictHostKeyChecking=accept-new -o ConnectTimeout=120 orchestrator@${google_compute_instance.orchestrator.network_interface.0.access_config.0.nat_ip} 'curl -o install_script.sh ${data.google_storage_object_signed_url.orchestrator_vm_install_sh_signed_url.signed_url} && chmod +x install_script.sh && sudo bash install_script.sh'"
+  connection {
+    type = "ssh"
+    user = "orchestrator"
+    host = google_compute_instance.orchestrator.network_interface.0.access_config.0.nat_ip
+    private_key = local.SSH_PRIVATE_KEY
   }
+
+  provisioner "remote-exec" {
+    inline = [
+      "curl -o install_script.sh ${data.google_storage_object_signed_url.orchestrator_vm_install_sh_signed_url.signed_url}",
+      "chmod +x install_script.sh",
+      "sudo bash install_script.sh"
+    ]
+  }
+
   depends_on = [ google_compute_instance.orchestrator, google_storage_bucket_object.orchestrator_vm_install_sh ]
 }
