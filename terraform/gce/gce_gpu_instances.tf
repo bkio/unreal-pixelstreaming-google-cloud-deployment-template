@@ -36,7 +36,7 @@ resource "google_compute_instance" "gpu_vms" {
     }
   }
 
-  metadata {
+  metadata = {
     startup-script = var.GPU_VM_INSTALL_SH_FILE_CONTENT
     ssh-keys = "orchestrator:${local.SSH_PUBLIC_KEY}"
   }
