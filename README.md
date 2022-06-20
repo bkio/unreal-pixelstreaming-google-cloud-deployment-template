@@ -1,6 +1,7 @@
 ## USAGE:
 
 When you commit on master branch; terraform will set up the environment. When it is complete, check your orchestrator vm's (gateway) public IP address. Then set A records with your domain name in your domain provider system; when you are sure that the records are acknowledged; run github workflow dispatch called "Enable HTTPS on the Orchestrator VM". Then it is all done.
+If you want to destroy your environment, simply call workflow dispatch "Terraform Destroy".
 ___
 ___
 ## Required environment variables to be set in Github Actions Secrets:
