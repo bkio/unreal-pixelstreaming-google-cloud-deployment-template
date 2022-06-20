@@ -46,6 +46,10 @@ resource "google_compute_instance" "orchestrator" {
     provisioning_model = "STANDARD"
   }
 
+  metadata = {
+    ssh-keys = "orchestrator:${local.SSH_PUBLIC_KEY}"
+  }
+
   # Ensure firewall rule is provisioned before server, so that SSH doesn't fail.
   depends_on = [ google_compute_firewall.allow_ssh ]
 }

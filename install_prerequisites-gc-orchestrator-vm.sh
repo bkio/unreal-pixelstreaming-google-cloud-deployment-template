@@ -41,7 +41,7 @@ sudo apt install -y nginx snapd
 sudo snap install core; sudo snap refresh core
 
 cd /etc/nginx/sites-available
-sudo tee [[EXTERNAL_VAR_DOMAIN_NAME]] > /dev/null << EOT
+sudo tee [[EXTERNAL_VAR_DOMAIN_NAME]] > /dev/null <<EOT
 server {
     server_name [[EXTERNAL_VAR_DOMAIN_NAME]];
 
@@ -64,7 +64,7 @@ sudo snap install --classic certbot
 
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 
-sudo tee /opt/scripts/docker_update.sh > /dev/null << EOT
+sudo tee /opt/scripts/docker_update.sh > /dev/null <<EOT
 #!/bin/bash
 
 # Arg1: Port
@@ -100,7 +100,7 @@ gcr.io/$2/$3:latest
 EOT
 sudo chmod +x /opt/scripts/docker_update.sh
 
-sudo tee /opt/scripts/enable_https.sh > /dev/null << EOT
+sudo tee /opt/scripts/enable_https.sh > /dev/null <<EOT
 #!/bin/bash
 
 if sudo test -f "/opt/https_enabled_[[EXTERNAL_VAR_DOMAIN_NAME]]"; then
