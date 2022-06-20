@@ -40,13 +40,10 @@ sudo apt install -y nginx snapd
 
 sudo snap install core; sudo snap refresh core
 
-# To be changed externally from Terraform!
-DOMAIN_NAME=[[EXTERNAL_VAR_DOMAIN_NAME]]
-
 cd /etc/nginx/sites-available
-sudo tee $DOMAIN_NAME > /dev/null << EOT
+sudo tee [[EXTERNAL_VAR_DOMAIN_NAME]] > /dev/null << EOT
 server {
-    server_name $DOMAIN_NAME;
+    server_name [[EXTERNAL_VAR_DOMAIN_NAME]];
 
     location / {
         proxy_pass http://127.0.0.1:8080;
