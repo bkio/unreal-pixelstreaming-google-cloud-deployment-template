@@ -8,6 +8,7 @@ locals {
 resource "google_compute_address" "orchestrator_static_ip_address" {
   name = local.GCE_ORCHESTRATOR_PUBLIC_IP_RESOURCE_NAME
   region = local.GCE_ORCHESTRATOR_VM_REGION
+  network_tier = "STANDARD"
 }
 
 data "google_compute_image" "orchestrator_vm_image" {
@@ -50,6 +51,10 @@ resource "google_compute_instance" "orchestrator" {
 }
 
 resource "null_resource" "post_orchestrator_vm_creation_create_local_file" {
+  triggers = {
+    instance = google_compute_instance.orchestrator.id
+  }
+
   provisioner "local-exec" {
     command = "echo '${replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME)}' > install_script_orchestrator_vm.sh"
   }

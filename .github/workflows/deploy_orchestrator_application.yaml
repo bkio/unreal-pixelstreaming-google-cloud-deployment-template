@@ -1,0 +1,46 @@
+name: Build and Deploy Orchestrator Application
+
+on: [workflow_dispatch]
+
+jobs:
+  enable-https:
+    name: Build and Deploy Orchestrator Application
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@v0
+      with:
+        service_account_email: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+        service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
+        export_default_credentials: true
+
+    # Configure Docker with Credentials
+    - name: Orchestrator - Configure Docker
+      run: |
+        gcloud auth configure-docker
+
+    # Setup dotnet env.
+    - uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '3.1.x'
+
+    # Build the Dotnet binaries and build docker image and publish
+    - name: Orchestrator - Build and Publish
+      working-directory: orchestrator-service/services/ServicePixelStreamingOrchestrator
+      run: |
+        mkdir output
+        dotnet restore ServicePixelStreamingOrchestrator.csproj
+        dotnet publish ServicePixelStreamingOrchestrator.csproj --runtime alpine-x64 --configuration Release --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o output/app/out
+        
+        cp Dockerfile output
+        cp -r Views output/public
+
+        cd output
+        
+        gcloud config set project ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+        gcloud builds submit --tag gcr.io/${{ secrets.GOOGLE_CLOUD_PROJECT }}/${{ secrets.ORCHESTRATOR_CONTAINER_NAME }}:latest

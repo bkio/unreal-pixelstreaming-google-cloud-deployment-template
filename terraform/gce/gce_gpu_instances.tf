@@ -54,6 +54,10 @@ resource "google_compute_instance" "gpu_vms" {
 }
 
 resource "null_resource" "post_gpu_vm_creation_create_local_file" {
+  triggers = {
+    instance_list = join(",", google_compute_instance.gpu_vms.*.id)
+  }
+  
   provisioner "local-exec" {
     command = "echo '${var.GPU_VM_INSTALL_SH_FILE_CONTENT}' > install_script_gpu_vm.sh"
   }
