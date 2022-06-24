@@ -6,8 +6,9 @@ else
     echo "done" | sudo tee /opt/installation_complete
 fi
 
-# Initial update
+# Initial update and upgrade
 sudo apt update -y
+sudo apt upgrade -y
 
 # Necessary prequisites for docker installation
 sudo apt install -y \
@@ -30,7 +31,7 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo groupadd docker
 
 # orchestrator is the name of user needs access to docker without sudo in my applications, change if necessary.
-sudo adduser orchestrator
+sudo adduser --disabled-password --gecos "" orchestrator
 sudo usermod -aG docker orchestrator
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
