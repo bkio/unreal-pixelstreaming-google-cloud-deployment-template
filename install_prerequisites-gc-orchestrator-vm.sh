@@ -36,6 +36,8 @@ sudo usermod -aG docker orchestrator
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
 
+sudo usermod -aG sudo orchestrator
+
 sudo apt install -y nginx snapd
 
 sudo snap install core; sudo snap refresh core
