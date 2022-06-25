@@ -83,7 +83,6 @@ resource "null_resource" "post_orchestrator_vm_creation_copy_and_execute_script"
 
   provisioner "remote-exec" {
     inline = [
-      "gcloud auth configure-docker gcr.io --quiet --project=${var.GOOGLE_CLOUD_PROJECT_ID}",
       "chmod +x /tmp/install_script_orchestrator_vm.sh",
       "sudo bash /tmp/install_script_orchestrator_vm.sh"
     ]
@@ -108,6 +107,7 @@ resource "null_resource" "deploy_orchestrator_app_to_vm" {
 
   provisioner "remote-exec" {
     inline = [
+      "gcloud auth configure-docker gcr.io --quiet --project=${var.GOOGLE_CLOUD_PROJECT_ID}",
       "sudo bash /opt/scripts/docker_update.sh 8080 ${var.GOOGLE_CLOUD_PROJECT_ID} ${var.ORCHESTRATOR_CONTAINER_NAME} ServicePixelStreamingOrchestrator ${join(",", var.VM_ZONES)} ${var.VM_NAME_PREFIX} ${var.PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME} ${var.MAX_USER_SESSION_PER_INSTANCE} ${base64encode(local.SSH_PRIVATE_KEY)} ${base64encode(var.GOOGLE_CREDENTIALS)}"
     ]
   }

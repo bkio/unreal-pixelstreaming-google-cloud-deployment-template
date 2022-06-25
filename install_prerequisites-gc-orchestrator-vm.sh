@@ -79,7 +79,7 @@ sudo tee /opt/scripts/docker_update.sh > /dev/null <<EOT
 # Arg6: Pixel Streaming GPU instances name prefix
 # Arg7: Pixel Streaming Unreal Container Image Name
 # Arg8: Max User Session per instance
-# Arg9: Compute Engine SSH Private Key Hexed
+# Arg9: Base64 Encoded Compute Engine SSH Private Key
 # Arg10: Base64 Encoded Google Credentials
 
 docker stop \$3 || true && docker rm \$3 || true

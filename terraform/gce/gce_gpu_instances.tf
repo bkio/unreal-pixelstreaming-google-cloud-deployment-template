@@ -82,9 +82,9 @@ resource "null_resource" "post_gpu_vm_creation_copy_and_execute_script" {
 
   provisioner "remote-exec" {
     inline = [
-      "gcloud auth configure-docker gcr.io --quiet --project=${var.GOOGLE_CLOUD_PROJECT_ID}",
       "chmod +x /tmp/install_script_gpu_vm.sh",
-      "sudo bash /tmp/install_script_gpu_vm.sh"
+      "sudo bash /tmp/install_script_gpu_vm.sh",
+      "gcloud auth configure-docker gcr.io --quiet --project=${var.GOOGLE_CLOUD_PROJECT_ID}"
     ]
   }
 
