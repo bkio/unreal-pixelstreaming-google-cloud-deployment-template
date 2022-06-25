@@ -16,7 +16,7 @@ variable "VM_NAME_PREFIX" {
   type = string
 }
 
-variable "ORCHESTRATOR_SERVICE_DIRECTORY_PATH" {
+variable "ORCHESTRATOR_SERVICE_DIRECTORY_FULL_PATH" {
   type = string
 }
 
