@@ -80,6 +80,9 @@ resource "null_resource" "post_orchestrator_vm_creation_build_deploy_dotnet_app"
 
       cd output
 
+      echo '${var.GOOGLE_CREDENTIALS}' > credentials.json
+      export GOOGLE_APPLICATION_CREDENTIALS=$PWD/credentials.json
+
       gcloud config set project ${var.GOOGLE_CLOUD_PROJECT_ID}
       gcloud builds submit --tag gcr.io/${var.GOOGLE_CLOUD_PROJECT_ID}/${var.ORCHESTRATOR_CONTAINER_NAME}:latest
     EOT
