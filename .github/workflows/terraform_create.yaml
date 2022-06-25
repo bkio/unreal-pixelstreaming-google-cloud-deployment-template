@@ -57,7 +57,8 @@ jobs:
     - name: Post Terraform Apply
       working-directory: terraform
       run: |
-        GPU_INSTANCES_NAMES=$(terraform output -json GPU_INSTANCES_NAMES)
+        GPU_INSTANCES_NAMES=$(terraform output GPU_INSTANCES_NAMES)
+        echo $GPU_INSTANCES_NAMES
 
         for current_vm_name in $(echo "${GPU_INSTANCES_NAMES}" | jq -r '.[]'); do
           gcloud compute instances stop ${current_vm_name} --project=${{ secrets.GOOGLE_CLOUD_PROJECT }}
@@ -66,7 +67,8 @@ jobs:
     # Deploy the orchestrator image to the Cloud Run
     - name: Orchestrator - Deploy
       run: |
-        ORCHESTRATOR_VM_ZONE="$(cut -d'_' -f1 <<<"${{ secrets.VM_ZONES }}")"
+        ORCHESTRATOR_VM_ZONE=`$(cut -d'_' -f1 <<<'${{ secrets.VM_ZONES }}')`
         GOOGLE_PLAIN_CREDENTIALS=`echo -n ${{ secrets.GOOGLE_CREDENTIALS }} | od -A n -t x1 | sed 's/ *//g'`
         COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY=$(terraform output INSTANCES_PRIVATE_SSH_KEY)
+        echo $COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY
         gcloud compute ssh --project=${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.VM_NAME_PREFIX }}-orchestrator --zone=$ORCHESTRATOR_VM_ZONE --quiet --command="sudo bash /opt/scripts/docker_update.sh 8080 ${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.ORCHESTRATOR_CONTAINER_NAME }} ServicePixelStreamingOrchestrator ${{ secrets.VM_ZONES }} ${{ secrets.VM_NAME_PREFIX }} ${{ secrets.PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME }} ${{ secrets.MAX_USER_SESSION_PER_INSTANCE }} $COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY $GOOGLE_PLAIN_CREDENTIALS"
