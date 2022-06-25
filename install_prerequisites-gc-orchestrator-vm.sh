@@ -8,6 +8,7 @@ fi
 
 # Initial update
 sudo apt update -y
+#sudo apt upgrade -y # This causes trouble with f1-micro.
 
 # Necessary prequisites for docker installation
 sudo apt install -y \
@@ -63,7 +64,7 @@ sudo snap install --classic certbot
 
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 
-sudo /opt/scripts
+sudo mkdir -p /opt/scripts
 
 sudo tee /opt/scripts/docker_update.sh > /dev/null <<EOT
 #!/bin/bash
@@ -110,7 +111,7 @@ else
     echo "done" | sudo tee /opt/https_enabled_[[EXTERNAL_VAR_DOMAIN_NAME]]
 fi
 
-sudo certbot --nginx --non-interactive --quiet --agree-tos --redirect --uir --hsts --staple-ocsp --must-staple -d [[EXTERNAL_VAR_DOMAIN_NAME]] --email admin@[[EXTERNAL_VAR_DOMAIN_NAME]]
+sudo certbot --nginx --non-interactive --quiet --agree-tos --redirect --hsts --staple-ocsp --must-staple -d [[EXTERNAL_VAR_DOMAIN_NAME]] --email admin@[[EXTERNAL_VAR_DOMAIN_NAME]]
 
 sudo systemctl reload nginx
 

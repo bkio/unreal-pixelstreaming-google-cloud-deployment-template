@@ -1,4 +1,4 @@
-name: Terraform Create
+name: Terraform Create - Deploy Full Environment
 
 on: [workflow_dispatch]
 
