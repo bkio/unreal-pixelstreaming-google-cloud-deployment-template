@@ -32,6 +32,10 @@ variable "ORCHESTRATOR_CONTAINER_NAME" {
   type = string
 }
 
+variable "PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME" {
+  type = string
+}
+
 variable "MAX_USER_SESSION_PER_INSTANCE" {
   type = string
 }
