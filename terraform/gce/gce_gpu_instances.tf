@@ -101,14 +101,14 @@ resource "null_resource" "terminate_gpu_vms_execute_script" {
   count = length(google_compute_instance.gpu_vms)
 
   provisioner "local-exec" {
-    command  = <<Settings
+    command  = <<EOT
       echo '${var.GOOGLE_CREDENTIALS}' > credentials.json
       export GOOGLE_APPLICATION_CREDENTIALS=$PWD/credentials.json
 
       gcloud compute instances stop ${google_compute_instance.gpu_vms[count.index].name} --project=${var.GOOGLE_CLOUD_PROJECT_ID} --zone=${google_compute_instance.gpu_vms[count.index].zone}
 
       rm $GOOGLE_APPLICATION_CREDENTIALS
-    Settings
+    EOT
   }
 
   depends_on = [ null_resource.post_gpu_vm_creation_copy_and_execute_script ]
