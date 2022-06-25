@@ -78,9 +78,7 @@ sudo tee /opt/scripts/docker_update.sh > /dev/null <<EOT
 # Arg7: Pixel Streaming Unreal Container Image Name
 # Arg8: Max User Session per instance
 # Arg9: Compute Engine SSH Private Key Hexed
-# Arg10: Plain Credentials (Hex coded json cred.)
-
-gcloud auth configure-docker gcr.io --quiet --project=\$2
+# Arg10: Base64 Encoded Google Credentials
 
 docker stop \$3 || true && docker rm \$3 || true
 
@@ -96,8 +94,8 @@ docker run -d --restart=always -p 8080:8080 --name=\$3 \
 -e VM_NAME_PREFIX=\$6 \
 -e PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME=\$7 \
 -e MAX_USER_SESSION_PER_INSTANCE=\$8 \
--e COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY=\${9} \
--e GOOGLE_PLAIN_CREDENTIALS=\${10} \
+-e COMPUTE_ENGINE_PLAIN_PRIVATE_KEY_BASE64=\${9} \
+-e GOOGLE_BASE64_CREDENTIALS=\${10} \
 gcr.io/\$2/\$3:latest
 EOT
 sudo chmod +x /opt/scripts/docker_update.sh

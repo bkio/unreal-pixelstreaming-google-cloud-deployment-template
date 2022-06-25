@@ -55,7 +55,7 @@ resource "google_compute_instance" "gpu_vms" {
 
 resource "null_resource" "post_gpu_vm_creation_create_local_file" {
   triggers = {
-    instance_list = join(",", google_compute_instance.gpu_vms.*.id)
+    always_run = "${timestamp()}"
   }
   
   provisioner "local-exec" {
@@ -91,4 +91,18 @@ resource "null_resource" "post_gpu_vm_creation_copy_and_execute_script" {
   count = length(google_compute_instance.gpu_vms)
 
   depends_on = [ null_resource.post_gpu_vm_creation_create_local_file ]
+}
+
+resource "null_resource" "terminate_gpu_vms_execute_script" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  count = length(google_compute_instance.gpu_vms)
+
+  provisioner "local-exec" {
+    command = "gcloud compute instances stop ${google_compute_instance.gpu_vms[count.index].name} --project=${var.GOOGLE_CLOUD_PROJECT_ID}"
+  }
+
+  depends_on = [ null_resource.post_gpu_vm_creation_copy_and_execute_script ]
 }

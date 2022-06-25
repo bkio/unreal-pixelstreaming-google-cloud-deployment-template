@@ -9,11 +9,3 @@ locals {
   SSH_PUBLIC_KEY = trimspace(tls_private_key.orchestrator_ssh_key_ed25519.public_key_openssh)
   SSH_PRIVATE_KEY = tls_private_key.orchestrator_ssh_key_ed25519.private_key_openssh
 }
-
-output "INSTANCES_PRIVATE_SSH_KEY" {
-  value = local.SSH_PRIVATE_KEY
-}
-
-output "GPU_INSTANCES_NAMES" {
-  value = ["${google_compute_instance.gpu_vms[*].name}"]
-}

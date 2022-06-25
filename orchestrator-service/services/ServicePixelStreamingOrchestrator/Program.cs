@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Text;
 using CloudConnectors;
 using CloudServiceUtilities;
 using WebServiceUtilities;
@@ -31,7 +32,7 @@ namespace ServicePixelStreamingOrchestrator
                     new string[] { "VM_NAME_PREFIX" },
                     new string[] { "VM_ZONES" },
                     new string[] { "MAX_USER_SESSION_PER_INSTANCE" },
-                    new string[] { "COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY" }
+                    new string[] { "COMPUTE_ENGINE_PLAIN_PRIVATE_KEY_BASE64" }
                 }))
                 return;
 
@@ -46,11 +47,11 @@ namespace ServicePixelStreamingOrchestrator
                 return;
             }
 
-            if (!Utility.HexDecode(out string ComputeEngineSSHPrivateKey, Connector.RequiredEnvironmentVariables["COMPUTE_ENGINE_PLAIN_SSH_PRIVATE_KEY"]))
-            {
-                Connector.LogService.WriteLogs(LogServiceMessageUtility.Single(ELogServiceLogType.Info, $"Hex decode operation for application credentials plain has failed: {Connector.RequiredEnvironmentVariables["COMPUTE_ENGINE_SSH_PRIVATE_KEY_HEXED"]}"), Connector.ProgramID, "WebService");
-                return;
-            }
+            if (!Utility.Base64Decode(out string ComputeEngineSSHPrivateKey, Connector.RequiredEnvironmentVariables["COMPUTE_ENGINE_PLAIN_PRIVATE_KEY_BASE64"],
+                (string _Message) =>
+                {
+                    Connector.LogService.WriteLogs(LogServiceMessageUtility.Single(ELogServiceLogType.Info, $"{_Message} - Base64 decode operation for compute engine private ssh key has failed: {Connector.RequiredEnvironmentVariables["COMPUTE_ENGINE_PLAIN_PRIVATE_KEY_BASE64"]}"), Connector.ProgramID, "WebService");
+                })) return;
 
             if (!Controller_PixelStreaming.Get().Initialize(
                 Connector.ProgramID,

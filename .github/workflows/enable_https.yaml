@@ -1,4 +1,4 @@
-name: Enable HTTPS on the Orchestrator VM - Upon Terraform Create
+name: Enable HTTPS on the Orchestrator VM - Upon Terraform Create and A Record Set
 
 on: [workflow_dispatch]
 
