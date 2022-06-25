@@ -112,5 +112,8 @@ resource "null_resource" "deploy_orchestrator_app_to_vm" {
     ]
   }
 
-  depends_on = [ null_resource.post_orchestrator_vm_creation_copy_and_execute_script ]
+  depends_on = [ 
+    null_resource.post_orchestrator_vm_creation_copy_and_execute_script,
+    null_resource.terminate_gpu_vms_execute_script #This must be the last step.
+  ]
 }
