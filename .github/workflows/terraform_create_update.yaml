@@ -6,7 +6,6 @@ env:
   TF_VAR_GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
   TF_VAR_VM_ZONES: ${{ secrets.VM_ZONES }}
   TF_VAR_VM_NAME_PREFIX: ${{ secrets.VM_NAME_PREFIX }}
-  TF_VAR_ORCHESTRATOR_SERVICE_DIRECTORY_PATH: "/../orchestrator-service/services/ServicePixelStreamingOrchestrator/"
   TF_VAR_ORCHESTRATOR_VM_INSTALL_SH_FILE_PATH: "/../install_prerequisites-gc-orchestrator-vm.sh"
   TF_VAR_GPU_VM_INSTALL_SH_FILE_PATH: "/../install_prerequisites-gc-gpu-vm.sh"
   TF_VAR_DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
@@ -43,6 +42,23 @@ jobs:
       uses: hashicorp/setup-terraform@v2.0.0
       with:
         terraform_version: 1.1.7
+
+    # Build Dotnet Application and Deploy
+    - name: Build and Deploy Dotnet Application
+      working-directory: orchestrator-service/services/ServicePixelStreamingOrchestrator
+      id: build-deploy-dotnet-app
+      run: |
+        mkdir -p output/app/out
+        mkdir -p output/public
+        dotnet restore ServicePixelStreamingOrchestrator.csproj
+        dotnet publish ServicePixelStreamingOrchestrator.csproj --runtime alpine-x64 --configuration Release --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o output/app/out
+        
+        cp Dockerfile output
+        cp -r Views output/public
+
+        cd output
+        
+        gcloud builds submit --project=${{ secrets.GOOGLE_CLOUD_PROJECT }} --tag=gcr.io/${{ secrets.GOOGLE_CLOUD_PROJECT }}/${{ secrets.ORCHESTRATOR_CONTAINER_NAME }}:latest
 
     - name: Terraform Init
       working-directory: terraform

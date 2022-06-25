@@ -16,10 +16,6 @@ variable "VM_NAME_PREFIX" {
   type = string
 }
 
-variable "ORCHESTRATOR_SERVICE_DIRECTORY_PATH" {
-  type = string
-}
-
 variable "ORCHESTRATOR_VM_INSTALL_SH_FILE_PATH" {
   type = string
 }

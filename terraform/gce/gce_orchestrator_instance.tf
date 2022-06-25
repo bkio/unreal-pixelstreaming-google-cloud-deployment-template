@@ -64,33 +64,6 @@ resource "null_resource" "post_orchestrator_vm_creation_create_local_file" {
   }
 }
 
-resource "null_resource" "post_orchestrator_vm_creation_build_deploy_dotnet_app" {
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-  provisioner "local-exec" {
-    working_dir = var.ORCHESTRATOR_SERVICE_DIRECTORY_FULL_PATH
-    command = <<Settings
-      echo '${var.GOOGLE_CREDENTIALS}' > credentials.json
-      export GOOGLE_APPLICATION_CREDENTIALS=$PWD/credentials.json
-
-      mkdir -p output/app/out
-      mkdir -p output/public
-      dotnet restore ServicePixelStreamingOrchestrator.csproj
-      dotnet publish ServicePixelStreamingOrchestrator.csproj --runtime alpine-x64 --configuration Release --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o output/app/out
-
-      cp Dockerfile output
-      cp -r Views output/public
-
-      cd output
-
-      gcloud builds submit --project=${var.GOOGLE_CLOUD_PROJECT_ID} --tag=gcr.io/${var.GOOGLE_CLOUD_PROJECT_ID}/${var.ORCHESTRATOR_CONTAINER_NAME}:latest
-
-      rm $GOOGLE_APPLICATION_CREDENTIALS
-    Settings
-  }
-}
-
 resource "null_resource" "post_orchestrator_vm_creation_copy_and_execute_script" {
   triggers = {
     instance = google_compute_instance.orchestrator.id
