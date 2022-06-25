@@ -54,16 +54,23 @@ resource "google_compute_instance" "orchestrator" {
   depends_on = [ google_compute_firewall.allow_ssh ]
 }
 
-resource "null_resource" "post_orchestrator_vm_creation_local_operations" {
+resource "null_resource" "post_orchestrator_vm_creation_create_local_file" {
   triggers = {
     always_run = "${timestamp()}"
   }
 
   provisioner "local-exec" {
-    command = <<-EOT
-      echo '${replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME)}' > install_script_orchestrator_vm.sh
+    command = "echo '${replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME)}' > install_script_orchestrator_vm.sh"
+  }
+}
 
-      cd ${var.ORCHESTRATOR_SERVICE_DIRECTORY_FULL_PATH}
+resource "null_resource" "post_orchestrator_vm_creation_build_deploy_dotnet_app" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+  provisioner "local-exec" {
+    working_dir = var.ORCHESTRATOR_SERVICE_DIRECTORY_FULL_PATH
+    command = <<-EOT
       mkdir output
       dotnet restore ServicePixelStreamingOrchestrator.csproj
       dotnet publish ServicePixelStreamingOrchestrator.csproj --runtime alpine-x64 --configuration Release --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o output/app/out
@@ -104,7 +111,10 @@ resource "null_resource" "post_orchestrator_vm_creation_copy_and_execute_script"
     ]
   }
 
-  depends_on = [ null_resource.post_orchestrator_vm_creation_local_operations ]
+  depends_on = [ 
+    null_resource.post_orchestrator_vm_creation_create_local_file,
+    null_resource.post_orchestrator_vm_creation_build_deploy_dotnet_app
+  ]
 }
 
 resource "null_resource" "deploy_orchestrator_app_to_vm" {
