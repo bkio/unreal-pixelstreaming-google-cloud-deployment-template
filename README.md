@@ -17,6 +17,9 @@ You can also find embedding example at ```orchestrator-service/services/ServiceP
 
 Underlining .NET framework is https://github.com/bkio/utilities-dotnet-framework an open-source framework for cloud-component abstraction developed by me. It is added to this repository as a submodule.
 ___
+## NOTES:
+If you have not requested for a quota upgrade for GPU usage, you may need to ask for that for ```GPUs (all regions)```. For me the initial quota was 0, I got it to be increased up to 4. Google responded and increased pretty much instantly.
+___
 ___
 ___
 ## Required environment variables to be set in Github Actions Secrets:
