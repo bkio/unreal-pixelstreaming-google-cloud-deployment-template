@@ -70,8 +70,12 @@ resource "null_resource" "post_orchestrator_vm_creation_build_deploy_dotnet_app"
   }
   provisioner "local-exec" {
     working_dir = var.ORCHESTRATOR_SERVICE_DIRECTORY_FULL_PATH
-    command = <<-EOT
-      mkdir output
+    command = <<-EOT  
+      echo '${var.GOOGLE_CREDENTIALS}' > credentials.json
+      export GOOGLE_APPLICATION_CREDENTIALS=$PWD/credentials.json
+
+      mkdir -p output/app/out
+      mkdir -p output/public
       dotnet restore ServicePixelStreamingOrchestrator.csproj
       dotnet publish ServicePixelStreamingOrchestrator.csproj --runtime alpine-x64 --configuration Release --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o output/app/out
 
@@ -80,11 +84,7 @@ resource "null_resource" "post_orchestrator_vm_creation_build_deploy_dotnet_app"
 
       cd output
 
-      echo '${var.GOOGLE_CREDENTIALS}' > credentials.json
-      export GOOGLE_APPLICATION_CREDENTIALS=$PWD/credentials.json
-
-      gcloud config set project ${var.GOOGLE_CLOUD_PROJECT_ID}
-      gcloud builds submit --tag gcr.io/${var.GOOGLE_CLOUD_PROJECT_ID}/${var.ORCHESTRATOR_CONTAINER_NAME}:latest
+      gcloud builds submit --project=${var.GOOGLE_CLOUD_PROJECT_ID} --tag=gcr.io/${var.GOOGLE_CLOUD_PROJECT_ID}/${var.ORCHESTRATOR_CONTAINER_NAME}:latest
     EOT
   }
 }
@@ -115,8 +115,7 @@ resource "null_resource" "post_orchestrator_vm_creation_copy_and_execute_script"
   }
 
   depends_on = [ 
-    null_resource.post_orchestrator_vm_creation_create_local_file,
-    null_resource.post_orchestrator_vm_creation_build_deploy_dotnet_app
+    null_resource.post_orchestrator_vm_creation_create_local_file
   ]
 }
 
