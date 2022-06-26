@@ -60,12 +60,12 @@ Email address of the service account
 ```my-service-account-name@my-google-project.iam.gserviceaccount.com```
 ___
 ### VM_ZONES
-Due to the hard limitations of Google Cloud for creating spot instances in terms of quota, there could only be one spot instance with a GPU in each region. (If you wish to have more, need to get in touch with Google, I have tried and they refused it for me. Large corporations may get it to be sorted out.) Therefore, if you need 4 GPU with VMs (meaning 4*max number of sessions per VM]); type 4 zones as a comma-separated string. 
+Due to the hard limitations of Google Cloud for creating preemptible/spot instances in terms of quota, there could only be one preemptible/spot instance with a GPU in each region. (If you wish to have more, need to get in touch with Google, I have tried and they refused my request to get it to be increased more than 1. Large corporations may get it to be sorted out, then set ```GPU_INSTANCES_PER_ZONE``` secret accordingly.) Therefore, if you need 4 GPU with VMs (meaning you will have max number of sessions support for 4 * MAX_USER_SESSION_PER_INSTANCE * GPU_INSTANCES_PER_ZONE]). Type 4 zones as a comma-separated string. 
 #### Example: 
 ```europe-west1-d,europe-west2-b,europe-west3-b,europe-west4-c```
 ___
 ### VM_NAME_PREFIX
-VM names will be created with names starting with this VM_NAME_PREFIX prefix. For example, if you specify 4 zones in the VM_ZONES variable, there will be 5 VMs created: your-vm-name-prefix-orchestrator, your-vm-name-prefix-gpu-vm-1, your-vm-name-prefix-gpu-vm-2, your-vm-name-prefix-gpu-vm-3, your-vm-name-prefix-gpu-vm-4 Be sure that these VM names are not in use project-wide.
+VM names will be created with names starting with this VM_NAME_PREFIX prefix. For example, if you specify 4 zones in the VM_ZONES variable, there will be (4 * GPU_INSTANCES_PER_ZONE + 1) VMs created: your-vm-name-prefix-orchestrator-vm, your-vm-name-prefix-gpu-vm-1,your-vm-name-prefix-gpu-vm-2... Be sure that these VM names are not in use project-wide.
 #### Example: 
 ```your-vm-name-prefix```
 ___
@@ -88,4 +88,4 @@ ___
 ### DOMAIN_NAME
 Your domain name to access the application. 
 #### Example: 
-```pixelstreaming.yourdomain.com or yourdomain.com```
+```pixelstreaming.yourdomain.com``` or ```yourdomain.com```
