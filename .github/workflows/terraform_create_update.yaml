@@ -49,7 +49,7 @@ jobs:
       working-directory: orchestrator-service/services/ServicePixelStreamingOrchestrator
       id: build-deploy-dotnet-app
       run: |
-        bFound=false && for line in $(git diff --name-only HEAD^ HEAD); do if [[ $line == orchestrator-service/* ]] || [[ $line == submodules/* ]]; then bFound=true; fi; done; if ! $bFound; then echo "No change done to Dotnet app. Skipping build and deploy..." && exit 0; fi;
+        if [[ $(git rev-list --all --count) != 1 ]]; then bFound=false && for line in $(git diff --name-only @~..@); do if [[ $line == orchestrator-service/* ]] || [[ $line == submodules/* ]]; then bFound=true; fi; done; if ! $bFound; then echo "No change done to Dotnet app. Skipping build and deploy..." && exit 0; fi; fi;
 
         mkdir -p output/app/out
         mkdir -p output/public
