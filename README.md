@@ -74,6 +74,9 @@ The variable you specified in the Unreal plugin, this docker image in Google Con
 #### Example: 
 ```your-unreal-application-docker-name```
 ___
+### GPU_INSTANCES_PER_ZONE
+How many GPU instances will be allocated per zone. If you manage to convince Google to give you more than 1 preemptible GPU per zone (which I could not), set this to that number. Otherwise 1.
+___
 ### MAX_USER_SESSION_PER_INSTANCE
 Orchestrator will allocate up to the number of user sessions you specified here to each VM. Each session will consume GPU/CPU/Memory resources, so depending on the complexity of your application, up to 4 could be ideal. Even with a basic Unreal template; 5 sessions in a VM did not work for Tesla T4 GPU based configuration.
 ___

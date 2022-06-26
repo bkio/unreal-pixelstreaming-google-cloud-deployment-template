@@ -32,6 +32,10 @@ variable "PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME" {
   type = string
 }
 
+variable "GPU_INSTANCES_PER_ZONE" {
+  type = string
+}
+
 variable "MAX_USER_SESSION_PER_INSTANCE" {
   type = string
 }

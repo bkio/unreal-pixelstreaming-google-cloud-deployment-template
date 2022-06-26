@@ -8,7 +8,7 @@ data "google_compute_image" "gpu_vm_image" {
 }
 
 resource "google_compute_instance" "gpu_vms" {
-  count                         = length(var.VM_ZONES)
+  count                         = length(var.VM_ZONES) * var.GPU_INSTANCES_PER_ZONE
   name                          = "${local.GCE_GPU_VMS_RESOURCE_NAME_PREFIX}-${count.index}"
   machine_type                  = "custom-6-23040"
   zone                          = element(var.VM_ZONES, count.index)
@@ -25,7 +25,7 @@ resource "google_compute_instance" "gpu_vms" {
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.subnets[count.index].name
+    subnetwork = google_compute_subnetwork.subnets[floor(count.index / var.GPU_INSTANCES_PER_ZONE)].name
     access_config {
       # Ephemeral
       network_tier = "STANDARD"

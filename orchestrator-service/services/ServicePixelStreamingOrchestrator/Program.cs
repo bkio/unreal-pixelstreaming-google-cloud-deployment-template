@@ -31,6 +31,7 @@ namespace ServicePixelStreamingOrchestrator
                     new string[] { "PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME" },
                     new string[] { "VM_NAME_PREFIX" },
                     new string[] { "VM_ZONES" },
+                    new string[] { "GPU_INSTANCES_PER_ZONE" },
                     new string[] { "MAX_USER_SESSION_PER_INSTANCE" },
                     new string[] { "COMPUTE_ENGINE_PLAIN_PRIVATE_KEY_BASE64" }
                 }))
@@ -39,7 +40,12 @@ namespace ServicePixelStreamingOrchestrator
             var PixelStreaming_GPUInstancesNamePrefix = Connector.RequiredEnvironmentVariables["VM_NAME_PREFIX"];
 
             var PixelStreaming_GPUInstancesZones = Connector.RequiredEnvironmentVariables["VM_ZONES"].Split(',');
-            int PixelStreaming_GPUInstancePerZone = PixelStreaming_GPUInstancesZones.Length;
+
+            if (!int.TryParse(Connector.RequiredEnvironmentVariables["GPU_INSTANCES_PER_ZONE"], out int PixelStreaming_GPUInstancesPerZone))
+            {
+                Connector.LogService.WriteLogs(LogServiceMessageUtility.Single(ELogServiceLogType.Info, "GPU_INSTANCES_PER_ZONE must be an integer."), Connector.ProgramID, "WebService");
+                return;
+            }
 
             if (!int.TryParse(Connector.RequiredEnvironmentVariables["MAX_USER_SESSION_PER_INSTANCE"], out int MaxUserSessionPerInstance))
             {
@@ -60,7 +66,7 @@ namespace ServicePixelStreamingOrchestrator
                 ComputeEngineSSHPrivateKey,
                 PixelStreaming_GPUInstancesNamePrefix, 
                 PixelStreaming_GPUInstancesZones, 
-                PixelStreaming_GPUInstancePerZone, 
+                PixelStreaming_GPUInstancesPerZone, 
                 MaxUserSessionPerInstance,
 
                 (string Message) =>
