@@ -74,5 +74,8 @@ distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
 sudo apt-get update
 sudo apt-get install -y nvidia-docker2
 
+# Install turn server
+sudo apt install -y coturn
+
 # And restart docker
 sudo systemctl restart docker
