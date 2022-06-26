@@ -44,10 +44,13 @@ jobs:
         terraform_version: 1.1.7
 
     # Build Dotnet Application and Deploy
+    # First check if there is any change done to orchestrator-service or submodules
     - name: Build and Deploy Dotnet Application
       working-directory: orchestrator-service/services/ServicePixelStreamingOrchestrator
       id: build-deploy-dotnet-app
       run: |
+        bFound=false && for line in $(git diff --name-only HEAD^ HEAD); do if [[ $line == orchestrator-service/* ]] || [[ $line == submodules/* ]]; then bFound=true; fi; done; if ! $bFound; then echo "No change done to Dotnet app. Skipping build and deploy..." && exit 0; fi;
+
         mkdir -p output/app/out
         mkdir -p output/public
         dotnet restore ServicePixelStreamingOrchestrator.csproj

@@ -32,6 +32,11 @@ resource "google_compute_instance" "gpu_vms" {
     }
   }
 
+  service_account {
+    email  = data.google_compute_default_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
+
   metadata = {
     ssh-keys = "orchestrator:${local.SSH_PUBLIC_KEY}"
   }
