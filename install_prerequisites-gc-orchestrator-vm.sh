@@ -86,6 +86,8 @@ docker stop \$3 || true && docker rm \$3 || true
 
 docker system prune --volumes --force
 
+gcloud auth configure-docker gcr.io --quiet --project=\$2
+
 docker pull gcr.io/\$2/\$3:latest
 
 docker run -d --restart=always -p 8080:8080 --name=\$3 \
