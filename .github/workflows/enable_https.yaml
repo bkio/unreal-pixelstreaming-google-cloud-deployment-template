@@ -18,4 +18,4 @@ jobs:
     - name: Task Execution
       run: |
         export ORCHESTRATOR_VM_ZONE="$(cut -d',' -f1 <<<"${{ secrets.VM_ZONES }}")"
-        gcloud compute ssh --project=${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.VM_NAME_PREFIX }}-orchestrator --zone=$ORCHESTRATOR_VM_ZONE --quiet --command="sudo bash /opt/scripts/enable_https.sh"
+        gcloud compute ssh --project=${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.VM_NAME_PREFIX }}-orchestrator-vm --zone=$ORCHESTRATOR_VM_ZONE --quiet --command="sudo bash /opt/scripts/enable_https.sh"
