@@ -29,7 +29,7 @@ namespace ServicePixelStreamingOrchestrator
                 {
                     new string[] { "GOOGLE_CLOUD_PROJECT_ID" },
                     new string[] { "PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME" },
-                    new string[] { "VM_NAME_PREFIX" },
+                    new string[] { "GPU_INSTANCES_VM_NAME_PREFIX" },
                     new string[] { "VM_ZONES" },
                     new string[] { "GPU_INSTANCES_PER_ZONE" },
                     new string[] { "MAX_USER_SESSION_PER_INSTANCE" },
@@ -37,7 +37,7 @@ namespace ServicePixelStreamingOrchestrator
                 }))
                 return;
 
-            var PixelStreaming_GPUInstancesNamePrefix = Connector.RequiredEnvironmentVariables["VM_NAME_PREFIX"];
+            var PixelStreaming_GPUInstancesNamePrefix = Connector.RequiredEnvironmentVariables["GPU_INSTANCES_VM_NAME_PREFIX"];
 
             var PixelStreaming_GPUInstancesZones = Connector.RequiredEnvironmentVariables["VM_ZONES"].Split(',');
 
