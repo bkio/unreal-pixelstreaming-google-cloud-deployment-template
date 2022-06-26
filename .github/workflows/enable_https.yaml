@@ -17,5 +17,5 @@ jobs:
       # Deploy the orchestrator image to the Cloud Run
     - name: Task Execution
       run: |
-        export ORCHESTRATOR_VM_ZONE="$(cut -d'_' -f1 <<<"${{ secrets.VM_ZONES }}")"
+        export ORCHESTRATOR_VM_ZONE="$(cut -d',' -f1 <<<"${{ secrets.VM_ZONES }}")"
         gcloud compute ssh --project=${{ secrets.GOOGLE_CLOUD_PROJECT }} ${{ secrets.VM_NAME_PREFIX }}-orchestrator --zone=$ORCHESTRATOR_VM_ZONE --quiet --command="sudo bash /opt/scripts/enable_https.sh"

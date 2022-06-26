@@ -1,10 +1,10 @@
-## WHAT IS UNREAL PIXELSTREAMING GOOGLE CLOUD DEPLOYMENT TEMPLATE?
+## What is Unreal Pixelstreaming Google Cloud Deployment Template?
 There are a lot of solutions for managed pixel streaming (server-side rendering) such as pureweb, 3dsource, vagon... Naturally all of these providers add additional profit margin based on minutes/hours of usage per user; which ends up being pretty expensive in a large scale. I have decided to implement this self-deployed google cloud based solution with an orchestrator service implementation in it. It is ensured to be as low cost as possible since it is based on SPOT (preemptible) resources and when there is not any sessions in the VM, the VM is terminated.
 ___
-## HOW DOES IT WORK?
+## How does it work?
 A new pixel streaming session request comes; orchestrator checks the VMs, if there is no VM running, starts one and allocates the user to the VM. If the max session per VM capacity is exceeded; boots up a new VM. Therefore some cold-start is expected when there is not any sessions being run in a VM or previous VM is fully utilized. A complex capable health-check system is in place.
 ___
-## USAGE:
+## Usage:
 
 First of all, fork this repository and set up the Github Action Secrets according to the specification written below.
 
@@ -17,8 +17,15 @@ You can also find embedding example at ```orchestrator-service/services/ServiceP
 
 Underlining .NET framework is https://github.com/bkio/utilities-dotnet-framework an open-source framework for cloud-component abstraction developed by me. It is added to this repository as a submodule.
 ___
-## NOTES:
+## Notes:
 If you have not requested for a quota upgrade for GPU usage, you may need to ask for that for ```GPUs (all regions)```. For me the initial quota was 0, I got it to be increased up to 4. Google responded and increased pretty much instantly.
+
+- Compute Engine API
+- Identity and Access Management (IAM) API
+- Container Registry API
+- Cloud Build API
+
+must be enabled in your google project before running the action.
 ___
 ___
 ___
