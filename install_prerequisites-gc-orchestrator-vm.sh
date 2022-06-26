@@ -60,6 +60,8 @@ server {
 }
 EOT
 
+sudo ln -s /etc/nginx/sites-available/[[EXTERNAL_VAR_DOMAIN_NAME]] /etc/nginx/sites-enabled/[[EXTERNAL_VAR_DOMAIN_NAME]]
+
 sudo systemctl reload nginx
 
 sudo snap install --classic certbot
@@ -115,10 +117,10 @@ fi
 
 sudo certbot --nginx --non-interactive --quiet --agree-tos --redirect --hsts --staple-ocsp --must-staple -d [[EXTERNAL_VAR_DOMAIN_NAME]] --email admin@[[EXTERNAL_VAR_DOMAIN_NAME]]
 
-sudo systemctl reload nginx
+sudo systemctl restart nginx
 
 sudo crontab -l > certbot_cron
-echo "43 6 * * * certbot renew --quiet --post-hook \"systemctl reload nginx\"" >> certbot_cron
+echo "43 6 * * * certbot renew --quiet --post-hook \"systemctl restart nginx\"" >> certbot_cron
 sudo crontab certbot_cron
 sudo rm certbot_cron
 EOT
