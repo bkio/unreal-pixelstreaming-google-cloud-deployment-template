@@ -54,7 +54,6 @@ jobs:
         if [[ $(git rev-list --all --count) != 1 ]]; then bFound=false && for line in $(git diff --name-only @~..@); do if [[ $line == orchestrator-service/* ]] || [[ $line == submodules/* ]]; then bFound=true; fi; done; if ! $bFound; then echo "No change done to Dotnet app. Skipping build and deploy..." && exit 0; fi; fi;
 
         mkdir -p output/app/out
-        mkdir -p output/public
         dotnet restore ServicePixelStreamingOrchestrator.csproj
         dotnet publish ServicePixelStreamingOrchestrator.csproj --runtime alpine-x64 --configuration Release --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o output/app/out
         
