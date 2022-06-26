@@ -36,6 +36,8 @@ sudo usermod -aG docker orchestrator
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
 
+sudo usermod -aG sudo orchestrator
+
 # Not to be prompted with annoying UI based keyboard configuration during installations
 export DEBIAN_FRONTEND=noninteractive
 
@@ -60,9 +62,11 @@ sudo apt install -y \
 	libvulkan1 \
 	mesa-vulkan-drivers
 
-# Vulkan tools does not exists in the default repos
+# Vulkan tools and utils do not exists in the default repos
 curl -O http://ftp.no.debian.org/debian/pool/main/v/vulkan-tools/vulkan-tools_1.2.162.0+dfsg1-1_amd64.deb
-sudo apt install -y ./*.deb
+sudo apt install -y vulkan-tools_1.2.162.0+dfsg1-1_amd64.deb
+curl -O http://ftp.no.debian.org/debian/pool/main/v/vulkan/vulkan-utils_1.1.70+dfsg1-1~bpo9+1_amd64.deb
+sudo apt install -y vulkan-utils_1.1.70+dfsg1-1~bpo9+1_amd64.deb
 rm -rf ./*.deb
 
 # Lastly, for being able to use gpus in dockers, we must install nvidia-container-toolkit
@@ -73,9 +77,6 @@ distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
             sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 sudo apt-get update
 sudo apt-get install -y nvidia-docker2
-
-# Install turn server
-sudo apt install -y coturn
 
 # And restart docker
 sudo systemctl restart docker
