@@ -9,19 +9,7 @@ fi
 sudo apt update -y
 
 # Necessary prequisites for docker installation
-sudo apt install -y \
-    	curl \
-		wget \
-    	ca-certificates \
-    	gnupg \
-    	lsb-release \
-		build-essential \
-		software-properties-common \
-		linux-headers-$(uname -r) \
-		linux-image-$(uname -r) \
-		pciutils \ 
-		gcc \
-		make
+sudo apt install -y curl wget ca-certificates gnupg lsb-release build-essential software-properties-common linux-headers-$(uname -r) linux-image-$(uname -r) gcc make pciutils
 
 # Docker installation
 sudo mkdir -p /etc/apt/keyrings
@@ -42,17 +30,18 @@ sudo systemctl enable containerd.service
 sudo usermod -aG sudo orchestrator
 
 curl -fSsl -O https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda_11.7.0_515.43.04_linux.run
+sudo sh cuda_11.7.0_515.43.04_linux.run --silent --toolkit
+rm -rf cuda_11.7.0_515.43.04_linux.run
+
 curl -fSsl -O https://us.download.nvidia.com/XFree86/Linux-x86_64/515.57/NVIDIA-Linux-x86_64-515.57.run
-sudo sh cuda_11.7.0_515.43.04_linux.run --silent --toolkit \
-	&& rm -rf cuda_11.7.0_515.43.04_linux.run
-sudo sh NVIDIA-Linux-x86_64-515.57.run --no-x-check --silent --no-questions --no-nouveau-check --disable-nouveau --run-nvidia-xconfig --install-libglvnd -k `uname -r` \
-	&& rm -rf NVIDIA-Linux-x86_64-515.57.run
+sudo sh NVIDIA-Linux-x86_64-515.57.run --no-x-check --silent --no-questions --no-nouveau-check --disable-nouveau --run-nvidia-xconfig --install-libglvnd -k `uname -r`
+rm -rf NVIDIA-Linux-x86_64-515.57.run
 
 # Add apt repository for NVIDIA related packages
 sudo wget -O- https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/3bf863cc.pub | gpg --dearmor | sudo tee /usr/share/keyrings/nvidia-drivers.gpg
 echo "deb [signed-by=/usr/share/keyrings/nvidia-drivers.gpg] https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/ /" | sudo tee /etc/apt/sources.list.d/nvidia-drivers.list
 
-sudo apt install -y libvulkan1
+sudo apt install -y libvulkan1 mesa-vulkan-drivers
 
 # Vulkan tools and utils do not exists in the default repos
 TEMP_DEB="$(mktemp)" && wget -O "$TEMP_DEB" 'http://ftp.no.debian.org/debian/pool/main/v/vulkan-tools/vulkan-tools_1.2.162.0+dfsg1-1_amd64.deb' && sudo dpkg -i "$TEMP_DEB" && rm -rf "$TEMP_DEB"
