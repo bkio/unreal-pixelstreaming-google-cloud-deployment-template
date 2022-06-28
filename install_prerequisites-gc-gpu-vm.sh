@@ -6,20 +6,23 @@ else
     echo "done" | sudo tee /opt/installation_complete
 fi
 
-# Initial update and upgrade
 sudo apt update -y
-sudo apt upgrade -y
 
 # Necessary prequisites for docker installation
 sudo apt install -y \
-    	ca-certificates \
     	curl \
+		wget \
+    	ca-certificates \
     	gnupg \
     	lsb-release \
-	build-essential \
-	software-properties-common \
-	wget
-	
+		build-essential \
+		software-properties-common \
+		linux-headers-$(uname -r) \
+		linux-image-$(uname -r) \
+		pciutils \ 
+		gcc \
+		make
+
 # Docker installation
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -38,36 +41,21 @@ sudo systemctl enable containerd.service
 
 sudo usermod -aG sudo orchestrator
 
-# Not to be prompted with annoying UI based keyboard configuration during installations
-export DEBIAN_FRONTEND=noninteractive
+curl -fSsl -O https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda_11.7.0_515.43.04_linux.run
+curl -fSsl -O https://us.download.nvidia.com/XFree86/Linux-x86_64/515.57/NVIDIA-Linux-x86_64-515.57.run
+sudo sh cuda_11.7.0_515.43.04_linux.run --silent --toolkit \
+	&& rm -rf cuda_11.7.0_515.43.04_linux.run
+sudo sh NVIDIA-Linux-x86_64-515.57.run --no-x-check --silent --no-questions --no-nouveau-check --disable-nouveau --run-nvidia-xconfig --install-libglvnd -k `uname -r` \
+	&& rm -rf NVIDIA-Linux-x86_64-515.57.run
 
 # Add apt repository for NVIDIA related packages
 sudo wget -O- https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/3bf863cc.pub | gpg --dearmor | sudo tee /usr/share/keyrings/nvidia-drivers.gpg
-sudo echo "deb [signed-by=/usr/share/keyrings/nvidia-drivers.gpg] https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/ /" | sudo tee /etc/apt/sources.list.d/nvidia-drivers.list
+echo "deb [signed-by=/usr/share/keyrings/nvidia-drivers.gpg] https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/ /" | sudo tee /etc/apt/sources.list.d/nvidia-drivers.list
 
-# contrib consists of latest NVIDIA driver along iwth repository we added above
-sudo add-apt-repository -y contrib
-sudo apt update -y && sudo apt upgrade -y
-
-# Installing "nvidia-driver" without the gpu driver setup provided by Google for VMs ends up with applications using GPU (like nvidia-smi) not recognizing the driver.
-# Thus, we first install the Google provided drivers, then we uninstall them with nvidia-installer --uninstall -s; then we install the latest with apt install -y -f nvidia-driver
-curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
-sudo -E python3 install_gpu_driver.py
-sudo -E nvidia-installer --uninstall -s
-sudo -E apt install -y -f nvidia-driver
-sudo apt install -y \
-	linux-headers-amd64 \
-	linux-image-amd64 \
-	nvidia-smi \
-	libvulkan1 \
-	mesa-vulkan-drivers
+sudo apt install -y libvulkan1
 
 # Vulkan tools and utils do not exists in the default repos
-curl -O http://ftp.no.debian.org/debian/pool/main/v/vulkan-tools/vulkan-tools_1.2.162.0+dfsg1-1_amd64.deb
-sudo apt install -y vulkan-tools_1.2.162.0+dfsg1-1_amd64.deb
-curl -O http://ftp.no.debian.org/debian/pool/main/v/vulkan/vulkan-utils_1.1.70+dfsg1-1~bpo9+1_amd64.deb
-sudo apt install -y vulkan-utils_1.1.70+dfsg1-1~bpo9+1_amd64.deb
-rm -rf ./*.deb
+TEMP_DEB="$(mktemp)" && wget -O "$TEMP_DEB" 'http://ftp.no.debian.org/debian/pool/main/v/vulkan-tools/vulkan-tools_1.2.162.0+dfsg1-1_amd64.deb' && sudo dpkg -i "$TEMP_DEB" && rm -rf "$TEMP_DEB"
 
 # Lastly, for being able to use gpus in dockers, we must install nvidia-container-toolkit
 distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \

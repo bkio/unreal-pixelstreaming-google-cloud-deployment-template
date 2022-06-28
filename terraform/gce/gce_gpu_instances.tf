@@ -19,7 +19,7 @@ resource "google_compute_instance" "gpu_vms" {
   boot_disk {
     initialize_params {
       image = data.google_compute_image.gpu_vm_image.self_link
-      size = 10
+      size = 15
       type = "pd-ssd"
     }
   }
