@@ -72,7 +72,12 @@ ___
 ### PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME
 The variable you specified in the Unreal plugin, this docker image in Google Container Registry will be deployed to the GPU instances when a session is loaded for gameplay experience. 
 #### Example: 
-```your-unreal-application-docker-name```
+```your-unreal-application-google-docker-repo-name```
+___
+### ORCHESTRATOR_CONTAINER_NAME
+When this pipeline is run, the orchestrator will be built and submitted with this tag.
+#### Example:
+```orchestrator-docker-google-repo-name```
 ___
 ### GPU_INSTANCES_PER_ZONE
 How many GPU instances will be allocated per zone. If you manage to convince Google to give you more than 1 preemptible GPU per zone (which I could not), set this to that number. Otherwise 1.
