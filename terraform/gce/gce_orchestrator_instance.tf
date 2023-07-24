@@ -107,7 +107,7 @@ resource "null_resource" "deploy_orchestrator_app_to_vm" {
     type = "ssh"
     user = "orchestrator"
     host = google_compute_instance.orchestrator.network_interface.0.access_config.0.nat_ip
-    private_key = local.SSH_PRIVATE_KEY
+    private_key = nonsensitive(local.SSH_PRIVATE_KEY)
   }
 
   provisioner "remote-exec" {
