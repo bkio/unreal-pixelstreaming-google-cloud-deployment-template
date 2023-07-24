@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Text;
 using CloudConnectors;
 using CloudServiceUtilities;
 using WebServiceUtilities;
