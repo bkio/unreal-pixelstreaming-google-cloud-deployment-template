@@ -106,14 +106,14 @@ resource "null_resource" "deploy_orchestrator_app_to_vm" {
   connection {
     type = "ssh"
     user = "orchestrator"
-    host = google_compute_instance.orchestrator.network_interface.0.access_config.0.nat_ip
+    host = nonsensitive(google_compute_instance.orchestrator.network_interface.0.access_config.0.nat_ip)
     private_key = nonsensitive(local.SSH_PRIVATE_KEY)
   }
 
   provisioner "remote-exec" {
     inline = [
-      "gcloud auth configure-docker gcr.io --quiet --project=${var.GOOGLE_CLOUD_PROJECT_ID}",
-      "bash /opt/scripts/docker_update.sh 8080 ${var.GOOGLE_CLOUD_PROJECT_ID} ${var.ORCHESTRATOR_CONTAINER_NAME} ServicePixelStreamingOrchestrator ${join(",", var.VM_ZONES)} ${local.GCE_GPU_VMS_RESOURCE_NAME_PREFIX} ${var.PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME} ${var.GPU_INSTANCES_PER_ZONE} ${var.MAX_USER_SESSION_PER_INSTANCE} ${base64encode(local.SSH_PRIVATE_KEY)} ${base64encode(var.GOOGLE_CREDENTIALS)}"
+      nonsensitive("gcloud auth configure-docker gcr.io --quiet --project=${var.GOOGLE_CLOUD_PROJECT_ID}"),
+      nonsensitive("bash /opt/scripts/docker_update.sh 8080 ${var.GOOGLE_CLOUD_PROJECT_ID} ${var.ORCHESTRATOR_CONTAINER_NAME} ServicePixelStreamingOrchestrator ${join(",", var.VM_ZONES)} ${local.GCE_GPU_VMS_RESOURCE_NAME_PREFIX} ${var.PIXEL_STREAMING_UNREAL_CONTAINER_IMAGE_NAME} ${var.GPU_INSTANCES_PER_ZONE} ${var.MAX_USER_SESSION_PER_INSTANCE} ${base64encode(local.SSH_PRIVATE_KEY)} ${base64encode(var.GOOGLE_CREDENTIALS)}")
     ]
   }
 
