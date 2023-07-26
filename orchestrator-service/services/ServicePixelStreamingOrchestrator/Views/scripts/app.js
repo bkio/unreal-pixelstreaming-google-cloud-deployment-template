@@ -75,6 +75,9 @@ window.onmessage = function (e) {
         genericPreventDefaultEvents.forEach(evName => document.removeEventListener(evName, genericPreventDefault));
         arrowPreventDefaultEvents.forEach(evName => document.removeEventListener(evName, arrowKeysHandler));
     }
+    else {
+        emitUIInteraction(JSON.parse(e.data));
+    }
 };
 
 let freezeFrameOverlay = null;

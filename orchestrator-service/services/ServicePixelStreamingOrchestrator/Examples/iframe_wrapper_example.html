@@ -34,10 +34,12 @@
 
 <div id="all-iframes-container">
     <div id="ps-iframe-container" tabindex="0" class="class-iframe-container">
-        <iframe id="ps-iframe" loading="eager" class="responsive-iframe" allowfullscreen="true" src="https://pixelstreaming.valhallatech.no" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation" scrolling="no">
+        <!--! CHANGE THE SRC !-->
+        <iframe id="ps-iframe" loading="eager" class="responsive-iframe" allowfullscreen="true" src="https://EXAMPLE.CHANGE.ME"></iframe> sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation" scrolling="no">
         </iframe>
     </div>
     <div id="yt-iframe-container" tabindex="0" class="class-iframe-container">
+        <!--! CHANGE THE YOUTUBE LINK TO SHOW SOMETHING WHILE ITS LOADED !-->
         <iframe id="yt-iframe" class="responsive-iframe" src="https://www.youtube-nocookie.com/embed/4Q8VfFNPs_k?mute=1&autoplay=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
         </iframe>
     </div>
@@ -57,6 +59,19 @@
     const ytIframeContainer = document.getElementById("yt-iframe-container");
     const psIframe = document.getElementById("ps-iframe");
     const ytIframe = document.getElementById("yt-iframe");
+
+    let onVisualWorkStarted = function() {
+        /*
+        * NOTE!
+        * To send custom messages to Unreal instance, use: 
+        * psIframe.contentWindow.postMessage(JSON.stringify({ "your_message": "message" }), "*");
+        * Send messages after onVisualWorkStarted is called. 
+        */
+        
+    };
+    let onDisconnected = function() {
+
+    }; 
 
     ytIframeContainer.style.display = "none";
 
@@ -138,10 +153,12 @@
                 inline: 'center'
             });
             psIframeContainer.focus();
+            onVisualWorkStarted();
         }
         else if (e.data == "disconnected") {
             ytIframeContainer.style.display = "none";
             allowDefault(); //Allow default
+            onDisconnected();
         }
     };
 </script>
