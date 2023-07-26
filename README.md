@@ -94,3 +94,8 @@ ___
 Your domain name to access the application. 
 #### Example: 
 ```pixelstreaming.yourdomain.com``` or ```yourdomain.com```
+___
+### ACME_OWNER_EMAIL
+Your e-mail address that will be used for ssl certificate generation with LetsEncrypt. Use an e-mail that is -believable- by LetsEncrypt, otherwise no warnings will be given due to such error unless you look into the logs of HTTPS creation stage.
+#### Example: 
+```valid_email@gmail.com```

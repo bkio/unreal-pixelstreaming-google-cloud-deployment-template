@@ -43,3 +43,7 @@ variable "MAX_USER_SESSION_PER_INSTANCE" {
 variable "DOMAIN_NAME" {
   type = string
 }
+
+variable "ACME_OWNER_EMAIL" {
+  type = string
+}

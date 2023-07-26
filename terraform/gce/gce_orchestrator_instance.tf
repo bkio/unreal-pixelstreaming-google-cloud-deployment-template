@@ -59,13 +59,17 @@ resource "google_compute_instance" "orchestrator" {
   depends_on = [ google_compute_firewall.allow_ssh ]
 }
 
+locals {
+  FINAL_ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT = replace(replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME), "[[EXTERNAL_VAR_ACME_OWNER_EMAIL]]", var.ACME_OWNER_EMAIL)
+}
+
 resource "null_resource" "post_orchestrator_vm_creation_create_local_file" {
   triggers = {
     always_run = "${timestamp()}"
   }
 
   provisioner "local-exec" {
-    command = "echo '${replace(var.ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT, "[[EXTERNAL_VAR_DOMAIN_NAME]]", var.DOMAIN_NAME)}' > install_script_orchestrator_vm.sh"
+    command = "echo '${local.FINAL_ORCHESTRATOR_VM_INSTALL_SH_FILE_CONTENT}' > install_script_orchestrator_vm.sh"
   }
 }
 
