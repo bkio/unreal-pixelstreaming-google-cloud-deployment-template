@@ -2015,24 +2015,24 @@ function load() {
 
 addResponseEventListener("handle_responses", function(data) {
     console.log("A request message has been received from Unreal Engine: " + data);
-    switch (data) {
-        case "returnClientPlatform":
-            let responseObj = {
-                clientPlatform: (bIsRunningOnMobile ? "mobile" : "desktop")
-            };
-            emitUIInteraction(responseObj);
-            console.log("Response has been sent to Unreal Engine: " + JSON.stringify(responseObj));
+    if (data === "returnClientPlatform") {
+        let responseObj = {
+            clientPlatform: (bIsRunningOnMobile ? "mobile" : "desktop")
+        };
+        emitUIInteraction(responseObj);
+        console.log("Response has been sent to Unreal Engine: " + JSON.stringify(responseObj));
 
-            //Visual work started, no need to throttle the CPU
-            if (bNoSleepEnabled) {
-                bNoSleepEnabled = false;
-                try { noSleep.disable().catch(function () { }); } catch (err) { }
-            }
-            // In case the app is running under an iframe
-            if (bIsInIframe) {
-                window.top.postMessage("visualWorkStarted", "*");
-            }
-
-            break;
+        //Visual work started, no need to throttle the CPU
+        if (bNoSleepEnabled) {
+            bNoSleepEnabled = false;
+            try { noSleep.disable().catch(function () { }); } catch (err) { }
+        }
+        // In case the app is running under an iframe
+        if (bIsInIframe) {
+            window.top.postMessage("visualWorkStarted", "*");
+        }
+    }
+    else if (bIsInIframe) {
+        window.top.postMessage(data, "*");
     }
 });
