@@ -52,6 +52,6 @@ variable "FILE_API_BUCKET_NAME" {
   type = string
 }
 
-variable "CLOUD_API_SECRET_KEYS_BASE64" {
+variable "CLOUD_API_SECRET_KEYS" {
   type = string
 }
