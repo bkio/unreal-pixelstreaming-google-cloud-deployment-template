@@ -8,17 +8,14 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Collections.Concurrent;
-using CommonUtilities;
-using WebServiceUtilities;
-using ServicePixelStreamingOrchestrator.Controllers;
-using WebResponse = WebServiceUtilities.WebResponse;
-using static ServicePixelStreamingOrchestrator.Controllers.Helper.PixelStreamingHelpers;
-using CloudServiceUtilities;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using Renci.SshNet.Messages;
-using System.Web;
-using System.Net.Mime;
+using Newtonsoft.Json.Linq;
+using CommonUtilities;
+using CloudServiceUtilities;
+using ServicePixelStreamingOrchestrator.Controllers;
+using WebServiceUtilities;
+using static ServicePixelStreamingOrchestrator.Controllers.Helper.PixelStreamingHelpers;
+using WebResponse = WebServiceUtilities.WebResponse;
 
 namespace ServicePixelStreamingOrchestrator.Endpoints
 {
@@ -330,10 +327,15 @@ namespace ServicePixelStreamingOrchestrator.Endpoints
                 {
                     return WebResponse.InternalError("List files operation has failed.");
                 }
+
                 var Result = new JArray();
-                foreach (var FileKey in FileKeys)
+
+                if (FileKeys != null)
                 {
-                    Result.Add(FileKey);
+                    foreach (var FileKey in FileKeys)
+                    {
+                        Result.Add(FileKey);
+                    }
                 }
                 return WebResponse.StatusOK("List files operation has succeeded.", new JObject()
                 {
