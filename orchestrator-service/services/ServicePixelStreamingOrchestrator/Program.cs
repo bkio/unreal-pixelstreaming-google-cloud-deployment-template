@@ -39,6 +39,14 @@ namespace ServicePixelStreamingOrchestrator
                 }))
                 return;
 
+            var bInitSuccess = true;
+
+            /*bInitSuccess &= Connector.WithVMService();
+            if (!bInitSuccess) return;*/ //VMService instances are individually being initialized like new VMServiceGC(...), so no need for "WithVMService".
+
+            bInitSuccess &= Connector.WithFileService();
+            if (!bInitSuccess) return;
+
             var PixelStreaming_GPUInstancesNamePrefix = Connector.RequiredEnvironmentVariables["GPU_INSTANCES_VM_NAME_PREFIX"];
 
             var PixelStreaming_GPUInstancesZones = Connector.RequiredEnvironmentVariables["VM_ZONES"].Split(',');
