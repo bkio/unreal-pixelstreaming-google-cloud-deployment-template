@@ -47,3 +47,11 @@ variable "DOMAIN_NAME" {
 variable "ACME_OWNER_EMAIL" {
   type = string
 }
+
+variable "FILE_API_BUCKET_NAME" {
+  type = string
+}
+
+variable "CLOUD_API_SECRET_KEYS_BASE64" {
+  type = string
+}

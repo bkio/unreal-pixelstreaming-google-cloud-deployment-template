@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\submodules\utilities-dotnet-framework\cloud-connectors\cloud-connector-file-service-gc\CloudConnector_FileService_GC.csproj" />
     <ProjectReference Include="..\..\..\submodules\utilities-dotnet-framework\cloud-connectors\cloud-connector-vm-service-gc\CloudConnector_VMService_GC.csproj" />
     <ProjectReference Include="..\..\..\submodules\utilities-dotnet-framework\utilities\web-service\web-service-utilities-basic\WebServiceUtilities_Basic.csproj" />
   </ItemGroup>

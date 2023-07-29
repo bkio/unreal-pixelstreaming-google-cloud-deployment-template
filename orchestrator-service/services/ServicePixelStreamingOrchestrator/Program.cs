@@ -10,6 +10,7 @@ using ServicePixelStreamingOrchestrator.Endpoints;
 using ServicePixelStreamingOrchestrator.Controllers;
 using static WebServiceUtilities.WebPrefixStructure;
 using CommonUtilities;
+using Newtonsoft.Json.Linq;
 
 namespace ServicePixelStreamingOrchestrator
 {
@@ -32,7 +33,9 @@ namespace ServicePixelStreamingOrchestrator
                     new string[] { "VM_ZONES" },
                     new string[] { "GPU_INSTANCES_PER_ZONE" },
                     new string[] { "MAX_USER_SESSION_PER_INSTANCE" },
-                    new string[] { "COMPUTE_ENGINE_PLAIN_PRIVATE_KEY_BASE64" }
+                    new string[] { "COMPUTE_ENGINE_PLAIN_PRIVATE_KEY_BASE64" },
+                    new string[] { "CLOUD_API_SECRET_KEYS_BASE64" },
+                    new string[] { "FILE_API_BUCKET_NAME" }
                 }))
                 return;
 
@@ -79,12 +82,47 @@ namespace ServicePixelStreamingOrchestrator
                     Connector.LogService.WriteLogs(LogServiceMessageUtility.Single(ELogServiceLogType.Info, Message), Connector.ProgramID, "WebService");
                 })) return;
 
+            if (!Utility.Base64Decode(out string CloudAPISecretsRaw, Connector.RequiredEnvironmentVariables["CLOUD_API_SECRET_KEYS_BASE64"],
+                (string _Message) =>
+                {
+                    Connector.LogService.WriteLogs(LogServiceMessageUtility.Single(ELogServiceLogType.Info, $"{_Message} - Base64 decode operation for CLOUD_API_SECRET_KEYS_BASE64 has failed: {Connector.RequiredEnvironmentVariables["CLOUD_API_SECRET_KEYS_BASE64"]}"), Connector.ProgramID, "WebService");
+                })) return;
+            var CloudAPISecrets = new HashSet<string>();
+            try
+            {
+                var TmpJArray = JArray.Parse(CloudAPISecretsRaw);
+
+                foreach (var TmpJToken in TmpJArray)
+                {
+                    if (TmpJToken.Type == JTokenType.String)
+                    {
+                        var AsStr = (string)TmpJToken;
+                        if (CloudAPISecrets.Contains(AsStr))
+                        {
+                            throw new Exception("Non-unique array elements");
+                        }
+                        CloudAPISecrets.Add(AsStr);
+                    }
+                    else
+                    {
+                        throw new Exception("Non-string array elements");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                Connector.LogService.WriteLogs(LogServiceMessageUtility.Single(ELogServiceLogType.Error, "CLOUD_API_SECRET_KEYS_BASE64 is misconfigured. It should contain strigified JSON array with unique string elements."), Connector.ProgramID, "WebService");
+                return;
+            }
+
+            var FileAPIBucketName = Connector.RequiredEnvironmentVariables["FILE_API_BUCKET_NAME"];
+
             /*
             * Web-http service initialization
             */
             new WebService(new List<WebPrefixStructure>()
             {
-                new WebPrefixStructure(new string[] { "*" }, () => new Handle_WebAndWebSocket_Request(), new WebSocketListenParameters(false))
+                new WebPrefixStructure(new string[] { "*" }, () => new Handle_WebAndWebSocket_Request(Connector.FileService, CloudAPISecrets, FileAPIBucketName), new WebSocketListenParameters(false))
             }
             .ToArray(), Connector.ServerPort).Run((string Message) =>
             {

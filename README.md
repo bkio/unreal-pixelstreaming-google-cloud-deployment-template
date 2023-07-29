@@ -37,7 +37,7 @@ Id of your google cloud project
 ```my-google-project```
 ___
 ### GOOGLE_CREDENTIALS 
-Google service account secrets in json form. The service account should have Editor, Cloud Build Service Account, Cloud Build Editor and Compute Admin permissions added. 
+Google service account secrets in json form. The service account should have Editor, Cloud Build Service Account, Cloud Build Editor, Storage Object Admin and Compute Admin permissions added. 
 #### Example: 
 ```json
 {
@@ -60,7 +60,7 @@ Email address of the service account
 ```my-service-account-name@my-google-project.iam.gserviceaccount.com```
 ___
 ### VM_ZONES
-Due to the hard limitations of Google Cloud for creating preemptible/spot instances in terms of quota, there could only be one preemptible/spot instance with a GPU in each region. (If you wish to have more, need to get in touch with Google, I have tried and they refused my request to get it to be increased more than 1. Large corporations may get it to be sorted out, then set ```GPU_INSTANCES_PER_ZONE``` secret accordingly.) Therefore, if you need 4 GPU with VMs (meaning you will have max number of sessions support for 4 * MAX_USER_SESSION_PER_INSTANCE * GPU_INSTANCES_PER_ZONE]). Type 4 zones as a comma-separated string. 
+Due to the hard limitations of Google Cloud for creating preemptible/spot instances in terms of quota, there could only be one preemptible/spot instance with a GPU in each region. (If you wish to have more, need to get in touch with Google, I have tried and they refused my request to get it to be increased more than 1. Large corporations may get it to be sorted out, then set ```GPU_INSTANCES_PER_ZONE``` secret accordingly.) Therefore, if you need 4 GPU with VMs (meaning you will have max number of sessions support for 4 * MAX_USER_SESSION_PER_INSTANCE * GPU_INSTANCES_PER_ZONE). Type 4 zones as a comma-separated string. 
 #### Example: 
 ```europe-west1-d,europe-west2-b,europe-west3-b,europe-west4-c```
 ___
@@ -99,3 +99,13 @@ ___
 Your e-mail address that will be used for ssl certificate generation with LetsEncrypt. Use an e-mail that is -believable- by LetsEncrypt, otherwise no warnings will be given due to such error unless you look into the logs of HTTPS creation stage.
 #### Example: 
 ```valid_email@gmail.com```
+___
+### CLOUD_API_SECRET_KEYS
+You may want to read/write files to cloud storage for storing states, or some other custom API needs. through orchestrator api. (/api/...) For this, orchestrator needs "Storage Object Admin" role and this environment variable to be set for knowing if the request is coming from a trusted source. /api/file is already implemented, you can check its logic. Post request, needs basic authorization key set as one of these secret strings.
+#### Example: 
+```["secret_string_1", "secret_string_2", ...]```
+___
+### FILE_API_BUCKET_NAME
+Bucket name for orchestrator usage for custom file operations, see description of CLOUD_API_SECRET_KEYS for more details.
+#### Example: 
+```bucket-name```
