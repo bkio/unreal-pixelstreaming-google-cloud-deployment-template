@@ -2014,7 +2014,6 @@ function load() {
 }
 
 addResponseEventListener("handle_responses", function(data) {
-    console.log("A request message has been received from Unreal Engine: " + data);
     if (data === "returnClientPlatform") {
         let responseObj = {
             clientPlatform: (bIsRunningOnMobile ? "mobile" : "desktop")
