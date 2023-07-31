@@ -351,49 +351,29 @@ namespace ServicePixelStreamingOrchestrator.Endpoints
 
                 if (Operation == "download")
                 {
-                    var MStream = new MemoryStream();
-                    var StreamWrapper = new StringOrStream(MStream, 0);
-                    if (!FileService.DownloadFile(FileAPIBucketName, FileKey, StreamWrapper, _ErrorMessageAction))
+                    if (!FileService.CreateSignedURLForDownload(out string SignedUrl, FileAPIBucketName, FileKey, 1, _ErrorMessageAction))
                     {
-                        return WebResponse.InternalError("Download operation has failed.");
-                    }
-                    return new WebServiceResponse(200, new StringOrStream(MStream, MStream.Length, () =>
-                    {
-                        try
-                        {
-                            MStream?.Dispose();
-                        }
-                        catch (Exception) { }
-                    }));
-                }
-                else if (Operation == "upload")
-                {
-                    if (!_Body.ContainsKey("content_base64") || _Body["content_base64"].Type != JTokenType.String)
-                        return WebResponse.BadRequest("Invalid or missing 'content_type' parameter in the body.");
-
-                    byte[] Content;
-                    try
-                    {
-                        Content = Convert.FromBase64String((string)_Body["content_base64"]);
-                    }
-                    catch (Exception)
-                    {
-                        return WebResponse.BadRequest("Field 'content_base64' must be base64 encoded.");
-                    }
-
-                    using (var MStream = new MemoryStream())
-                    {
-                        var StreamWrapper = new StringOrStream(MStream, 0);
-                        MStream.Write(Content);
-
-                        if (!FileService.UploadFile(StreamWrapper, FileAPIBucketName, FileKey, ERemoteFileReadPublicity.AuthenticatedRead, null, _ErrorMessageAction))
-                        {
-                            return WebResponse.InternalError("Upload operation has failed.");
-                        }
+                        return WebResponse.InternalError("Download link creation operation has failed.");
                     }
                     return WebResponse.StatusOK("Upload file operation has succeeded.", new JObject()
                     {
-                        ["file_key"] = FileKey
+                        ["file_key"] = FileKey,
+                        ["download_url"] = SignedUrl
+                    });
+                }
+                else if (Operation == "upload")
+                {
+                    if (!_Body.ContainsKey("content_type") || _Body["content_type"].Type != JTokenType.String)
+                        return WebResponse.BadRequest("Invalid or missing 'content_type' parameter in the body.");
+
+                    if (!FileService.CreateSignedURLForUpload(out string SignedUrl, FileAPIBucketName, FileKey, (string)_Body["content_type"], 1, _ErrorMessageAction))
+                    {
+                        return WebResponse.InternalError("Upload link creation operation has failed.");
+                    }
+                    return WebResponse.StatusOK("Upload file operation has succeeded.", new JObject()
+                    {
+                        ["file_key"] = FileKey,
+                        ["upload_url"] = SignedUrl
                     });
                 }
                 else if (Operation == "delete")
