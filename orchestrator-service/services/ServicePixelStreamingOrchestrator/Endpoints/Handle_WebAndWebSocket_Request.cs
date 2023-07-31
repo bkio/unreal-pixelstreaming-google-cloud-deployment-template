@@ -352,19 +352,19 @@ namespace ServicePixelStreamingOrchestrator.Endpoints
                 if (Operation == "download")
                 {
                     var MStream = new MemoryStream();
-                    var StreamWrapper = new StringOrStream(MStream, 0, () =>
+                    var StreamWrapper = new StringOrStream(MStream, 0);
+                    if (!FileService.DownloadFile(FileAPIBucketName, FileKey, StreamWrapper, _ErrorMessageAction))
+                    {
+                        return WebResponse.InternalError("Download operation has failed.");
+                    }
+                    return new WebServiceResponse(200, new StringOrStream(MStream, MStream.Length, () =>
                     {
                         try
                         {
                             MStream?.Dispose();
                         }
                         catch (Exception) { }
-                    });
-                    if (!FileService.DownloadFile(FileAPIBucketName, FileKey, StreamWrapper, _ErrorMessageAction))
-                    {
-                        return WebResponse.InternalError("Download operation has failed.");
-                    }
-                    return new WebServiceResponse(200, StreamWrapper);
+                    }));
                 }
                 else if (Operation == "upload")
                 {
