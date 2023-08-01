@@ -130,7 +130,8 @@ namespace ServicePixelStreamingOrchestrator
             */
             new WebService(new List<WebPrefixStructure>()
             {
-                new WebPrefixStructure(new string[] { "*" }, () => new Handle_WebAndWebSocket_Request(Connector.FileService, CloudAPISecrets, FileAPIBucketName), new WebSocketListenParameters(false))
+                new WebPrefixStructure(new string[] { "/api/*" }, () => new Handle_WebAPI_Request(Connector.FileService, CloudAPISecrets, FileAPIBucketName)),
+                new WebPrefixStructure(new string[] { "*" }, () => new Handle_WebAndWebSocket_Request(), new WebSocketListenParameters(false))
             }
             .ToArray(), Connector.ServerPort).Run((string Message) =>
             {
